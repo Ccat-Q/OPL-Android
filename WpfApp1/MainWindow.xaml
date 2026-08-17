@@ -114,7 +114,7 @@
                     <TextBox HorizontalAlignment="Left" Margin="502,48,0,0" TextWrapping="Wrap" Text="未连接" VerticalAlignment="Top" Width="180" IsReadOnly="True" x:Name="newetuid"/>
                     <Label Content="当前所在网络：" HorizontalAlignment="Left" Margin="540,25,0,0" VerticalAlignment="Top"/>
                     <Label Content="节点：" HorizontalAlignment="Left" Margin="504,146,0,0" VerticalAlignment="Top"/>
-                    <TextBox HorizontalAlignment="Left" Margin="467,169,0,0" TextWrapping="Wrap" Text="tcp://p.gldhn.top:11010" VerticalAlignment="Top" Width="260" x:Name="etnode" Height="18"/>
+                    <TextBox HorizontalAlignment="Left" Margin="491,169,0,0" TextWrapping="Wrap" Text="tcp://p.gldhn.top:11010" VerticalAlignment="Top" Width="200" x:Name="etnode"/>
                     <Label Content="网络UID：" HorizontalAlignment="Left" Margin="547,220,0,0" VerticalAlignment="Top"/>
                     <Button Content="?" Margin="485,146,0,0" VerticalAlignment="Top" Click="EThelp" Height="19" Width="17" Grid.RowSpan="1" Grid.ColumnSpan="1" Padding="0,0,0,0"/>
                 </Grid>
@@ -264,7 +264,8 @@
                     <CheckBox Content="开机自动运行主程序" Margin="50,88,0,0"  x:Name="Autoup_bootn"  VerticalAlignment="Top"/>
                     <CheckBox Content="主程序运行后自动启动" Margin="50,118,0,0" x:Name="Autoup_openn"  VerticalAlignment="Top"/>
                     <CheckBox Content="运营商检测警告" Margin="50,148,0,0" x:Name="Ispwarning"  VerticalAlignment="Top"/>
-                    <CheckBox Content="关闭时隐藏在任务栏" Margin="50,178,0,0" x:Name="minimize"  VerticalAlignment="Top"/>
+                    <CheckBox Content="关闭时隐藏在任务栏" Margin="50,178,0,0"  x:Name="minimize"  VerticalAlignment="Top"/>
+                    <CheckBox Content="退出时清理日志缓存" Margin="50,208,0,0"  x:Name="CleanLogCheck"  VerticalAlignment="Top"/>
 
                     <Button Content="自动添加安全中心排除" Margin="480,29,0,0" VerticalAlignment="Top" Width="201" Click="AddMpBotton"/>
                     <ComboBox Margin="121,318,0,0" Width="183" x:Name="ServersCombo" SelectionChanged="ServersCombo_SelectionChanged">
