@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -84,6 +84,7 @@ namespace userdata
         public bool ispwarning { get; set; } = true; // 获取isp
         public bool minimize { get; set; } = true;  //最小化到托盘
         public bool qusminimize { get; set; } = true;  //是否询问最小化到托盘
+        public bool CleanLogOnExit { get; set; } = false; // 退出时清理日志缓存
         public bool beta { get; set; } = false;
         public List<ispinfo> ispinfos { get; set; } = new List<ispinfo>();
         public string LastNoticeTime { get; set; } = ""; // 上次已读公告的时间

@@ -179,9 +179,8 @@ namespace OPL_WpfApp
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                //Logger.Log("[警告] 未获取到节点列表" + ex.Message);
             }
         }
     }
