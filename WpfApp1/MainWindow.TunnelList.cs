@@ -84,6 +84,7 @@ namespace OPL_WpfApp
                     var item = new TunnelListItem();
                     item.Bind(index, app.AppName, app.PeerNode, app.Protocol, app.DstPort, app.SrcPort,
                         iplink_str, app.Enabled == 1, clo, statusText);
+                    item.SetEditingEnabled(!on);
                     item.EnabledChanged += TunnelItem_EnabledChanged;
                     item.CopyRequested += CopyipLink;
                     item.EditRequested += Edit;

@@ -12,8 +12,14 @@
                 <ResourceDictionary Source="AppColors.xaml"/>
                 <ui:ThemeResources/>
                 <ui:XamlControlsResources />
-                
+
             </ResourceDictionary.MergedDictionaries>
+            <SolidColorBrush x:Key="{x:Static ui:ThemeKeys.ButtonBackgroundDisabledKey}" Color="#337F7F7F"/>
+            <SolidColorBrush x:Key="{x:Static ui:ThemeKeys.ButtonForegroundDisabledKey}" Color="#FF7F7F7F"/>
+            <SolidColorBrush x:Key="{x:Static ui:ThemeKeys.ButtonBorderBrushDisabledKey}" Color="#667F7F7F"/>
+            <SolidColorBrush x:Key="{x:Static ui:ThemeKeys.AccentButtonBackgroundDisabledKey}" Color="#997F7F7F"/>
+            <SolidColorBrush x:Key="{x:Static ui:ThemeKeys.AccentButtonForegroundDisabledKey}" Color="#FFE5E5E5"/>
+            <SolidColorBrush x:Key="{x:Static ui:ThemeKeys.AccentButtonBorderBrushDisabledKey}" Color="#997F7F7F"/>
             <Style TargetType="Button" x:Key="svg-button">
                 <Setter Property="SnapsToDevicePixels" Value="true"/>
                 <Setter Property="HorizontalContentAlignment" Value="Center"/>
@@ -29,7 +35,12 @@
                             <ControlTemplate.Triggers>
                                 <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="ButtonC" Property="Background" Value="#147F7F7F"/></Trigger>
                                 <Trigger Property="IsPressed" Value="True"><Setter TargetName="ButtonC" Property="Background" Value="#287F7F7F"/></Trigger>
-                                <Trigger Property="IsEnabled" Value="False"><Setter TargetName="ButtonC" Property="Opacity" Value="0.4"/></Trigger>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter TargetName="ButtonC" Property="Background" Value="#667F7F7F"/>
+                                    <Setter TargetName="ButtonC" Property="Opacity" Value="0.45"/>
+                                    <Setter Property="Foreground" Value="#FF7F7F7F"/>
+                                    <Setter Property="Cursor" Value="Arrow"/>
+                                </Trigger>
                             </ControlTemplate.Triggers>
                         </ControlTemplate>
                     </Setter.Value>

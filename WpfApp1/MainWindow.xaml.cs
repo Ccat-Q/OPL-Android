@@ -24,8 +24,18 @@ namespace OPL_WpfApp
         set set = new set();
         Net net = new Net();
 
-        public bool on = false;
-        public bool eton = false;
+        private bool _on;
+        private bool _eton;
+        public bool on
+        {
+            get => _on;
+            set { _on = value; UpdateActionAvailability(); }
+        }
+        public bool eton
+        {
+            get => _eton;
+            set { _eton = value; UpdateActionAvailability(); }
+        }
         public static bool over = true;
         int tcpnum = 0;
         string opname = "openp2p.exe";
@@ -72,6 +82,7 @@ namespace OPL_WpfApp
             Initialization();
 
             ets = new etstart(this);
+            UpdateActionAvailability();
 
             this.notifyIcon = new NotifyIcon();
             this.notifyIcon.Text = "OPL 联机工具";
@@ -92,6 +103,36 @@ namespace OPL_WpfApp
                     this.Show(o, e);
                 }
             };
+        }
+
+        private void UpdateActionAvailability()
+        {
+            if (!IsInitialized) return;
+            if (!Dispatcher.CheckAccess())
+            {
+                Dispatcher.BeginInvoke(new Action(UpdateActionAvailability));
+                return;
+            }
+
+            bool canEdit = !on;
+            QuickAddButton.IsEnabled = canEdit;
+            NewConnectionButton.IsEnabled = canEdit;
+            CloseAllButton.IsEnabled = canEdit;
+            ExportLogButton.IsEnabled = canEdit;
+            ResetProgramButton.IsEnabled = canEdit;
+            CreateEasyTierButton.IsEnabled = canEdit;
+            JoinEasyTierButton.IsEnabled = canEdit;
+            LeaveEasyTierButton.IsEnabled = eton;
+            openbutton.IsEnabled = !eton;
+
+            if (!tunnel.getruning())
+            {
+                tunbutton.IsEnabled = canEdit;
+                tunjoinbutton.IsEnabled = canEdit;
+            }
+
+            foreach (Controls.TunnelListItem item in sdlist.Items)
+                item.SetEditingEnabled(canEdit);
         }
     }
 }

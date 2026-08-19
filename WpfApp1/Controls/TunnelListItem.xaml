@@ -52,9 +52,9 @@
             </StackPanel>
 
             <StackPanel Grid.Column="4" Grid.RowSpan="2" Orientation="Horizontal" VerticalAlignment="Center">
-                <Button Content="编辑" Click="Edit_Click" Margin="0,0,6,0"/>
-                <Button Content="删除" Click="Delete_Click" Margin="0,0,6,0" ToolTip="删除后无法恢复"/>
-                <Border Width="36" Height="36" Background="Transparent" Cursor="SizeAll"
+                <Button x:Name="EditButton" Content="编辑" Click="Edit_Click" Margin="0,0,6,0"/>
+                <Button x:Name="DeleteButton" Content="删除" Click="Delete_Click" Margin="0,0,6,0" ToolTip="删除后无法恢复"/>
+                <Border x:Name="DragHandle" Width="36" Height="36" Background="Transparent" Cursor="SizeAll"
                         ToolTip="拖动到其他隧道以调整顺序" AutomationProperties.Name="拖动排序"
                         PreviewMouseLeftButtonDown="DragHandle_MouseLeftButtonDown"
                         PreviewMouseMove="DragHandle_MouseMove">

@@ -46,6 +46,16 @@ namespace OPL_WpfApp.Controls
             _updating = false;
         }
 
+        public void SetEditingEnabled(bool enabled)
+        {
+            EnabledCheckBox.IsEnabled = enabled;
+            EditButton.IsEnabled = enabled;
+            DeleteButton.IsEnabled = enabled;
+            DragHandle.IsHitTestVisible = enabled;
+            DragHandle.Opacity = enabled ? 1 : 0.45;
+            DragHandle.Cursor = enabled ? Cursors.SizeAll : Cursors.Arrow;
+        }
+
         private void EnabledCheckBox_Changed(object sender, RoutedEventArgs e)
         {
             if (!_updating) EnabledChanged?.Invoke(this, EventArgs.Empty);

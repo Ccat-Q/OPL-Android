@@ -82,8 +82,8 @@
                             <TextBlock Grid.Column="3" Text="共享带宽" VerticalAlignment="Center" Margin="0,0,12,0"/>
                             <TextBox Grid.Column="4" x:Name="share" Width="54" TextChanged="share_TextChanged"/>
                             <TextBlock Grid.Column="5" Text="Mbps" VerticalAlignment="Center" Margin="8,0,0,0"/>
-                            <Button Grid.Column="6" Content="快速添加" Click="Quick_Add" Margin="12,0,8,0" ToolTip="从剪贴板中的联机码自动添加"/>
-                            <Button Grid.Column="7" Content="新建连接" Click="Button_Click" Padding="16,8"
+                            <Button Grid.Column="6" x:Name="QuickAddButton" Content="快速添加" Click="Quick_Add" Margin="12,0,8,0" ToolTip="从剪贴板中的联机码自动添加"/>
+                            <Button Grid.Column="7" x:Name="NewConnectionButton" Content="新建连接" Click="Button_Click" Padding="16,8"
                                     Style="{StaticResource {x:Static ui:ThemeKeys.AccentButtonStyleKey}}"/>
                         </Grid>
                     </Border>
@@ -170,13 +170,13 @@
                                              ToolTip="输入节点地址；可一次粘贴多个地址"/>
                                     <Button Grid.Column="2" Content="添加" Click="AddEasyTierPeer_Click"/>
                                 </Grid>
-                                <Button Content="创建网络" Click="crearEtNet" Margin="0,0,0,18" Style="{StaticResource {x:Static ui:ThemeKeys.AccentButtonStyleKey}}"/>
+                                <Button x:Name="CreateEasyTierButton" Content="创建网络" Click="crearEtNet" Margin="0,0,0,18" Style="{StaticResource {x:Static ui:ThemeKeys.AccentButtonStyleKey}}"/>
                                 <TextBlock Text="加入已有网络" Style="{StaticResource Caption}"/>
                                 <TextBox x:Name="etNetText" Margin="0,4,0,8" ToolTip="输入网络 UID"/>
                                 <Grid>
                                     <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="8"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                                    <Button Content="加入网络" Click="joinEtNet"/>
-                                    <Button Grid.Column="2" Content="退出网络" Click="leaveEtNet"/>
+                                    <Button x:Name="JoinEasyTierButton" Content="加入网络" Click="joinEtNet"/>
+                                    <Button Grid.Column="2" x:Name="LeaveEasyTierButton" Content="退出网络" Click="leaveEtNet"/>
                                 </Grid>
                                 <Button Content="查看帮助" Click="EThelp" Margin="0,14,0,0"/>
                                 <TextBlock Text="实验性功能 · 由 EasyTier 提供服务" Style="{StaticResource Caption}" Margin="0,10,0,0"/>
@@ -329,7 +329,7 @@
                     <Grid Grid.Row="1" Margin="0,0,0,12">
                         <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                         <Button Content="帮助文档" Click="Openwiki" Margin="0,0,8,0"/><Button Grid.Column="1" Content="作者主页" Click="OpenMe" Margin="0,0,8,0"/><Button Grid.Column="2" Content="GitHub" Click="OpenGit"/>
-                        <Button Grid.Column="4" Content="导出日志" Click="ExportLog" Margin="0,0,8,0"/><Button Grid.Column="5" Content="重置程序" Click="ResetUID_Button_Click" ToolTip="重置 UID 并删除全部隧道配置"/>
+                        <Button Grid.Column="4" x:Name="ExportLogButton" Content="导出日志" Click="ExportLog" Margin="0,0,8,0"/><Button Grid.Column="5" x:Name="ResetProgramButton" Content="重置程序" Click="ResetUID_Button_Click" ToolTip="重置 UID 并删除全部隧道配置"/>
                     </Grid>
                     <Grid Grid.Row="2">
                         <Grid.ColumnDefinitions><ColumnDefinition Width="3*"/><ColumnDefinition Width="12"/><ColumnDefinition Width="1*" MinWidth="180"/></Grid.ColumnDefinitions>
@@ -347,7 +347,7 @@
                 <Label Grid.Column="1" x:Name="ver" Content="v1.0.1.9" Padding="0" VerticalAlignment="Center"/>
                 <Button Grid.Column="3" Content="导出连接码" Click="Outlist" Margin="0,0,8,0"/>
                 <Button Grid.Column="4" Content="生成联机码" Click="Multput" Margin="0,0,8,0"/>
-                <Button Grid.Column="5" Content="关闭所有隧道" Click="CloseAll" Margin="0,0,8,0"/>
+                <Button Grid.Column="5" x:Name="CloseAllButton" Content="关闭所有隧道" Click="CloseAll" Margin="0,0,8,0"/>
                 <Button Grid.Column="6" x:Name="openbutton" Content="启动" Click="Button_Click_open" Width="112" Style="{StaticResource {x:Static ui:ThemeKeys.AccentButtonStyleKey}}"/>
             </Grid>
         </Border>
