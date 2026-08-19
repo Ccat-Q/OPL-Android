@@ -14,8 +14,15 @@ namespace userdata
 {
     internal class Updata
     {
-        public Updata(string url,string SaveName, string absolutePath="",bool iszip=false)
+        public Updata(string url,string SaveName, string absolutePath="",bool iszip=false, string expectedHash=null)
         {
+            if (SaveName == "openp2p.zip" && string.IsNullOrWhiteSpace(expectedHash))
+            {
+                MainWindow_opl.over = false;
+                Logger.Log("[错误]缺少openp2p文件校验值，已取消更新", "错误");
+                return;
+            }
+
             string absolutePathed;
             if(absolutePath=="")
                 absolutePathed = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "bin", SaveName);
@@ -23,7 +30,7 @@ namespace userdata
                 absolutePathed = Path.Combine(absolutePath, SaveName);
             if (!File.Exists(absolutePathed))
             {
-                _ = Dmfile(url, SaveName, absolutePath,iszip); //更新包 
+                _ = Dmfile(url, SaveName, absolutePath,iszip, expectedHash); //更新包
                 if(SaveName== "nvb.zip")
                     _ = Dmfile(Net.Getmirror("https://file.gldhn.top/file/updata.exe"), "updata.exe", AppDomain.CurrentDomain.BaseDirectory);
             }else
@@ -32,7 +39,7 @@ namespace userdata
             }
 
         }
-        public async Task Dmfile(string url,string name,string savePath = "", bool iszip = false)
+        public async Task Dmfile(string url,string name,string savePath = "", bool iszip = false, string expectedHash = null)
         {
             Logger.Log($"[提示]开始下载文件：{url} 保存名 ：{name}");
             string dsavePath = AppDomain.CurrentDomain.BaseDirectory;
@@ -57,19 +64,32 @@ namespace userdata
                     if(name== "openp2p.zip" || name == "openp2p21.zip")
                     {
                         string saveOPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "bin", name);
-                        if (File.Exists(saveOPath))
+                        string verifyPath = name == "openp2p.zip"
+                            ? Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "bin", "openp2p.exe")
+                            : null;
+                        bool extracted = File.Exists(saveOPath) && OPL_WpfApp.App.ExtractZipAndOverwrite(
+                            saveOPath,
+                            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "bin"),
+                            verifyPath,
+                            expectedHash);
+                        MainWindow_opl.over = extracted;
+                        if (extracted)
                         {
-                            OPL_WpfApp.App.ExtractZipAndOverwrite(saveOPath, Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "bin"));
+                            Logger.Log($"[提示]已完成关键文件下载！可以启动程序了");
                         }
-                        MainWindow_opl.over = true;
-                        Logger.Log($"[提示]已完成关键文件下载！可以启动程序了");
+                        else
+                        {
+                            Logger.Log("[错误]关键文件解压或校验失败，请重试", "错误");
+                        }
                     }
                     if (iszip)
                     {
                         if (File.Exists(dsavePath))
                         {
-                            OPL_WpfApp.App.ExtractZipAndOverwrite(dsavePath, savePath);
-                            Logger.Log($"[提示]已解压文件：{dsavePath}");
+                            if (OPL_WpfApp.App.ExtractZipAndOverwrite(dsavePath, savePath))
+                                Logger.Log($"[提示]已解压文件：{dsavePath}");
+                            else
+                                Logger.Log($"[错误]解压文件失败：{dsavePath}", "错误");
                         }
                     }
                 }

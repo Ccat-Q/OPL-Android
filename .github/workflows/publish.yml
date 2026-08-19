@@ -2,181 +2,193 @@ name: Build and Publish
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [master]
     paths-ignore:
-      - '**.md'
-      - '.gitignore'
-      - 'LICENSE'
+      - "**.md"
+      - .gitignore
+      - LICENSE
   pull_request:
-    branches: [ "master" ]
-  workflow_dispatch:  # 允许手动触发
+    branches: [master]
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: windows-latest
-
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-
-    - name: Setup MSBuild
-      uses: microsoft/setup-msbuild@v2
-
-    - name: Setup NuGet
-      uses: nuget/setup-nuget@v2
-
-    - name: Restore NuGet packages
-      run: nuget restore "OPL WpfApp.sln"
-
-    - name: Build solution
-      run: msbuild /p:Configuration=Release /p:Platform="Any CPU" "OPL WpfApp.sln"
-
-    - name: Upload build artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: build-output
-        path: |
-          WpfApp1\bin\Release\OPL_WpfApp.exe
-          updata\bin\Release\updata.exe
-        retention-days: 7
+      - uses: actions/checkout@v4
+      - uses: microsoft/setup-msbuild@v2
+      - uses: nuget/setup-nuget@v2
+      - run: nuget restore "OPL WpfApp.sln"
+      - run: msbuild /p:Configuration=Release /p:Platform="Any CPU" "OPL WpfApp.sln"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: build-output
+          path: |
+            WpfApp1\bin\Release\OPL_WpfApp.exe
+            updata\bin\Release\updata.exe
+          retention-days: 7
 
   publish:
-    # 仅在 push 到 master 时执行发布
     if: github.event_name == 'push'
     needs: build
     runs-on: windows-latest
-
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    # ====== 版本检查：读取代码 pvn 并与 preset.json 比较 ======
-    - name: Check if publish is needed
-      id: check
-      shell: pwsh
-      run: |
-        # 读取代码中的更新号
-        $netCs = Get-Content "WpfApp1\cs\net.cs" -Raw
-        $pvn = [int][regex]::Match($netCs, 'pvn\s*=\s*(\d+)').Groups[1].Value
+      - name: Check if publish is needed
+        id: check
+        shell: pwsh
+        run: |
+          $netCs = Get-Content "WpfApp1\cs\net.cs" -Raw
+          $pvn = [int][regex]::Match($netCs, 'pvn\s*=\s*(\d+)').Groups[1].Value
+          $assemblyInfo = Get-Content "WpfApp1\Properties\AssemblyInfo.cs" -Raw
+          $version = [regex]::Match($assemblyInfo, 'AssemblyFileVersion\("([^"]+)"\)').Groups[1].Value
 
-        # 读取代码中的版本号
-        $assemblyInfo = Get-Content "WpfApp1\Properties\AssemblyInfo.cs" -Raw
-        $version = [regex]::Match($assemblyInfo, '\[assembly:\s+AssemblyFileVersion\("([^"]+)"\)\]').Groups[1].Value
+          try {
+            $remotePvn = [int](Invoke-RestMethod "https://raw.githubusercontent.com/Guailoudou/urlfile/main/file/json/update.json").version
+          } catch {
+            try {
+              # Only used for the first migration, before update.json exists.
+              $remotePvn = [int](Invoke-RestMethod "https://raw.githubusercontent.com/Guailoudou/urlfile/main/file/json/preset.json").version
+            } catch {
+              $remotePvn = -1
+            }
+          }
 
-        Write-Host "代码更新号 (pvn): $pvn"
-        Write-Host "代码版本号: $version"
+          "pvn=$pvn" >> $env:GITHUB_OUTPUT
+          "version=$version" >> $env:GITHUB_OUTPUT
+          "zipname=$version-$pvn.zip" >> $env:GITHUB_OUTPUT
+          "should_publish=$($pvn -gt $remotePvn)".ToLower() >> $env:GITHUB_OUTPUT
+          Write-Host "Local update: $pvn; remote update: $remotePvn"
 
-        # 从远程获取 preset.json 中的 version
-        $presetUrl = "https://raw.githubusercontent.com/Guailoudou/urlfile/master/file/json/preset.json"
-        try {
-          $response = Invoke-RestMethod -Uri $presetUrl
-          $remotePvn = [int]$response.version
-          Write-Host "远程更新号 (preset.json version): $remotePvn"
-        } catch {
-          Write-Host "⚠️ 无法获取远程 preset.json，将执行发布..."
-          $remotePvn = -1
-        }
+      - name: Download build artifacts
+        if: steps.check.outputs.should_publish == 'true'
+        uses: actions/download-artifact@v4
+        with:
+          name: build-output
+          path: build-output
 
-        # 输出变量
-        echo "pvn=$pvn" >> $env:GITHUB_OUTPUT
-        echo "version=$version" >> $env:GITHUB_OUTPUT
-        echo "zipname=$version-$pvn.zip" >> $env:GITHUB_OUTPUT
+      - name: Clone publishing repositories
+        if: steps.check.outputs.should_publish == 'true'
+        shell: pwsh
+        run: |
+          git clone https://github.com/Guailoudou/urlfile.git urlfile-repo
+          git clone https://github.com/Guailoudou/openp2p.git openp2p-repo
+          git -C urlfile-repo config user.name "github-actions[bot]"
+          git -C urlfile-repo config user.email "github-actions[bot]@users.noreply.github.com"
 
-        # 比较：代码 pvn > 远程 pvn 才发布
-        if ($pvn -gt $remotePvn) {
-          Write-Host "✅ $pvn > $remotePvn，需要发布"
-          echo "should_publish=true" >> $env:GITHUB_OUTPUT
-        } else {
-          Write-Host "⏭️ $pvn <= $remotePvn，跳过发布"
-          echo "should_publish=false" >> $env:GITHUB_OUTPUT
-        }
+      - name: Check OpenP2P version
+        if: steps.check.outputs.should_publish == 'true'
+        id: core
+        shell: pwsh
+        run: |
+          $protocol = Get-Content "openp2p-repo\core\protocol.go" -Raw
+          $coreVersion = [regex]::Match($protocol, 'OpenP2PVersion\s*=\s*"([^"]+)"').Groups[1].Value
+          if (!$coreVersion) { throw "OpenP2PVersion not found" }
 
-    # ====== 以下所有步骤仅在需要发布时执行 ======
+          $updatePath = "urlfile-repo\file\json\update.json"
+          $migration = !(Test-Path $updatePath)
+          if ($migration) {
+            $preset = Get-Content "urlfile-repo\file\json\preset.json" -Raw | ConvertFrom-Json
+            $publishedVersion = [regex]::Match($preset.opurl, 'openp2p-(?:r)?([0-9.]+)\.windows-386\.zip').Groups[1].Value
+          } else {
+            $publishedVersion = (Get-Content $updatePath -Raw | ConvertFrom-Json).opversion
+          }
 
-    - name: Download build artifacts
-      if: steps.check.outputs.should_publish == 'true'
-      uses: actions/download-artifact@v4
-      with:
-        name: build-output
-        path: build-output
+          "version=$coreVersion" >> $env:GITHUB_OUTPUT
+          "should_build=$($coreVersion -ne $publishedVersion)".ToLower() >> $env:GITHUB_OUTPUT
+          "migration=$migration".ToLower() >> $env:GITHUB_OUTPUT
+          Write-Host "OpenP2P source: $coreVersion; published: $publishedVersion"
 
-    - name: Create ZIP package
-      if: steps.check.outputs.should_publish == 'true'
-      shell: pwsh
-      run: |
-        $zipName = "${{ steps.check.outputs.zipname }}"
-        Write-Host "Creating $zipName..."
-        Compress-Archive -Path "build-output\WpfApp1\bin\Release\OPL_WpfApp.exe" -DestinationPath $zipName -Force
-        Write-Host "ZIP created: $zipName"
+      - name: Setup Go
+        if: steps.check.outputs.should_publish == 'true' && steps.core.outputs.should_build == 'true'
+        uses: actions/setup-go@v7
+        with:
+          go-version-file: openp2p-repo/go.mod
+          cache-dependency-path: openp2p-repo/go.sum
 
-    - name: Calculate MD5
-      if: steps.check.outputs.should_publish == 'true'
-      id: md5
-      shell: pwsh
-      run: |
-        $zipName = "${{ steps.check.outputs.zipname }}"
-        $md5 = (Get-FileHash -Path $zipName -Algorithm MD5).Hash.ToLower()
-        Write-Host "MD5: $md5"
-        echo "md5=$md5" >> $env:GITHUB_OUTPUT
+      - name: Build OpenP2P core
+        if: steps.check.outputs.should_publish == 'true' && steps.core.outputs.should_build == 'true'
+        shell: pwsh
+        working-directory: openp2p-repo
+        env:
+          GOOS: windows
+          GOARCH: "386"
+          CGO_ENABLED: "0"
+          GOPROXY: https://goproxy.io,direct
+        run: go build -trimpath -ldflags="-s -w" -o ..\openp2p.exe cmd/openp2p.go
 
-    - name: Clone urlfile repository
-      if: steps.check.outputs.should_publish == 'true'
-      shell: pwsh
-      run: |
-        git clone https://github.com/Guailoudou/urlfile.git urlfile-repo
-        cd urlfile-repo
-        git config user.name "github-actions[bot]"
-        git config user.email "github-actions[bot]@users.noreply.github.com"
+      - name: Package and hash files
+        if: steps.check.outputs.should_publish == 'true'
+        id: package
+        shell: pwsh
+        run: |
+          $appZip = "${{ steps.check.outputs.zipname }}"
+          Compress-Archive "build-output\WpfApp1\bin\Release\OPL_WpfApp.exe" $appZip -Force
+          "app_md5=$((Get-FileHash $appZip -Algorithm MD5).Hash.ToLower())" >> $env:GITHUB_OUTPUT
 
-    - name: Copy files to urlfile
-      if: steps.check.outputs.should_publish == 'true'
-      shell: pwsh
-      run: |
-        $zipName = "${{ steps.check.outputs.zipname }}"
-        Copy-Item $zipName "urlfile-repo\file\uppack\$zipName"
-        Write-Host "Copied $zipName to urlfile-repo\file\uppack\"
+          if ("${{ steps.core.outputs.should_build }}" -eq "true") {
+            $coreZip = "openp2p-${{ steps.core.outputs.version }}.windows-386.zip"
+            Compress-Archive openp2p.exe $coreZip -Force
+            "core_zip=$coreZip" >> $env:GITHUB_OUTPUT
+            "core_md5=$((Get-FileHash openp2p.exe -Algorithm MD5).Hash.ToLower())" >> $env:GITHUB_OUTPUT
+          }
 
-    - name: Update preset.json
-      if: steps.check.outputs.should_publish == 'true'
-      shell: pwsh
-      run: |
-        $version = "${{ steps.check.outputs.version }}"
-        $pvn = "${{ steps.check.outputs.pvn }}"
-        $md5 = "${{ steps.md5.outputs.md5 }}"
-        $upurl = "https://file.gldhn.top/file/uppack/$version-$pvn.zip"
+      - name: Update publishing files
+        if: steps.check.outputs.should_publish == 'true'
+        shell: pwsh
+        run: |
+          $pvn = [int]"${{ steps.check.outputs.pvn }}"
+          $appZip = "${{ steps.check.outputs.zipname }}"
+          $appUrl = "https://file.gldhn.top/file/uppack/$appZip"
+          $updatePath = "urlfile-repo\file\json\update.json"
+          $presetPath = "urlfile-repo\file\json\preset.json"
 
-        $presetPath = "urlfile-repo\file\json\preset.json"
-        $json = Get-Content $presetPath -Raw | ConvertFrom-Json
+          Copy-Item $appZip "urlfile-repo\file\uppack\$appZip"
 
-        $json.version = $pvn
-        $json.uphash = $md5
-        $json.upurl = $upurl
+          if (Test-Path $updatePath) {
+            $update = Get-Content $updatePath -Raw | ConvertFrom-Json
+          } else {
+            $preset = Get-Content $presetPath -Raw | ConvertFrom-Json
+            $oldCoreVersion = [regex]::Match($preset.opurl, 'openp2p-(?:r)?([0-9.]+)\.windows-386\.zip').Groups[1].Value
+            $update = [pscustomobject]@{
+              version = 0; upurl = ""; uphash = ""
+              opversion = $oldCoreVersion; opurl = $preset.opurl; ophash = $preset.ophash
+            }
+          }
 
-        # 输出紧凑格式（无换行无缩进）
-        $jsonString = $json | ConvertTo-Json -Depth 100 -Compress
-        Set-Content $presetPath -Value $jsonString -NoNewline
+          $update.version = $pvn
+          $update.upurl = $appUrl
+          $update.uphash = "${{ steps.package.outputs.app_md5 }}"
 
-        Write-Host "Updated preset.json:"
-        Write-Host "  version: $pvn"
-        Write-Host "  uphash: $md5"
-        Write-Host "  upurl: $upurl"
+          if ("${{ steps.core.outputs.should_build }}" -eq "true") {
+            $coreZip = "${{ steps.package.outputs.core_zip }}"
+            Copy-Item $coreZip "urlfile-repo\file\$coreZip"
+            $update.opversion = "${{ steps.core.outputs.version }}"
+            $update.opurl = "https://file.gldhn.top/file/$coreZip"
+            $update.ophash = "${{ steps.package.outputs.core_md5 }}"
+          }
 
-    - name: Commit and push to urlfile
-      if: steps.check.outputs.should_publish == 'true'
-      shell: pwsh
-      env:
-        URLFILE_TOKEN: ${{ secrets.URLFILE_TOKEN }}
-      run: |
-        cd urlfile-repo
-        $version = "${{ steps.check.outputs.version }}"
-        $pvn = "${{ steps.check.outputs.pvn }}"
+          $update | ConvertTo-Json -Compress | Set-Content $updatePath -NoNewline
 
-        git add .
-        git commit -m "更新版本 $version-$pvn"
+          if ("${{ steps.core.outputs.migration }}" -eq "true") {
+            # Last legacy sync: old clients receive the release that reads update.json.
+            $preset = Get-Content $presetPath -Raw | ConvertFrom-Json
+            $preset.version = $update.version
+            $preset.upurl = $update.upurl
+            $preset.uphash = $update.uphash
+            $preset.opurl = $update.opurl
+            $preset.ophash = $update.ophash
+            $preset | ConvertTo-Json -Depth 100 -Compress | Set-Content $presetPath -NoNewline
+          }
 
-        # 使用 token 推送
-        $remoteUrl = "https://x-access-token:$env:URLFILE_TOKEN@github.com/Guailoudou/urlfile.git"
-        git remote set-url origin $remoteUrl
-        git push origin main
-
-        Write-Host "✅ Published version $version-$pvn"
+      - name: Commit and push
+        if: steps.check.outputs.should_publish == 'true'
+        shell: pwsh
+        env:
+          URLFILE_TOKEN: ${{ secrets.URLFILE_TOKEN }}
+        run: |
+          git -C urlfile-repo add .
+          git -C urlfile-repo commit -m "更新版本 ${{ steps.check.outputs.version }}-${{ steps.check.outputs.pvn }}"
+          git -C urlfile-repo remote set-url origin "https://x-access-token:$env:URLFILE_TOKEN@github.com/Guailoudou/urlfile.git"
+          git -C urlfile-repo push origin main

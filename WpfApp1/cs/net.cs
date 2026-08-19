@@ -60,41 +60,39 @@ namespace userdata
                         presetss = JsonConvert.DeserializeObject<Presets>(contentString);
                         servers = presetss.servers;
                     }
-                    int v = presetss.version;
-                    string ophash = presetss.ophash;
-                    string opurl = presetss.opurl;
-                    string opPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "bin", "openp2p.exe");
-                    if (v > pvn)
+                    updateInfo = await GetUpdate(httpClient);
+                    if (updateInfo != null)
                     {
-                        if (!set.settings.Auto_up)
+                        string opPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "bin", "openp2p.exe");
+                        if (updateInfo.version > pvn)
                         {
-                            Logger.Log("[提示]你的程序不是最新版本哦~ 但是你关闭了更新");
+                            if (!set.settings.Auto_up)
+                            {
+                                Logger.Log("[提示]你的程序不是最新版本哦~ 但是你关闭了更新");
+                            }
+                            else
+                            {
+                                new Updata(Getmirror(updateInfo.upurl), "nvb.zip");
+                                Logger.Log($"[提示]获取预设完成,你的程序不是最新版本哦~ 开始后台下载更新包-{isgitee}");
+                            }
                         }
                         else
                         {
-                            new Updata(Getmirror(presetss.upurl), "nvb.zip");
-                            Logger.Log($"[提示]获取预设完成,你的程序不是最新版本哦~ 开始后台下载更新包-{isgitee}");
+                            Logger.Log($"[提示]获取预设完成,当前为最新版本~ {isgitee}");
                         }
-                    }
-                    else
-                    {
-                        Logger.Log($"[提示]获取预设完成,当前为最新版本~ {isgitee}");
-                    }
-                    if ((CalculateMD5Hash(opPath) != ophash && ophash != null) || !File.Exists(opPath))
-                    {
-                        
-                        if (!set.settings.Auto_upop)
+                        if ((CalculateMD5Hash(opPath) != updateInfo.ophash && updateInfo.ophash != null) || !File.Exists(opPath))
                         {
-                            Logger.Log("[提示]你的openp2p不是最新版本哦~ 但是你关闭了更新");
+                            if (!set.settings.Auto_upop)
+                            {
+                                Logger.Log("[提示]你的openp2p不是最新版本哦~ 但是你关闭了更新");
+                            }
+                            else
+                            {
+                                new Updata(Getmirror(updateInfo.opurl), "openp2p.zip", expectedHash: updateInfo.ophash);
+                                Logger.Log("[提示]你的openp2p不是最新版本哦~ 开始后台下载更新包");
+                                MainWindow_opl.over = false;
+                            }
                         }
-                        else
-                        {
-                            new Updata(Getmirror(presetss.opurl), "openp2p.zip");
-                            Logger.Log("[提示]你的openp2p不是最新版本哦~ 开始后台下载更新包");
-                            MainWindow_opl.over = false;
-                            //MessageBox.Show("将开始关键文件下载~ 开始后台下载更新包", "提示");
-                        }
-                        
                     }
                     Uplog.Log(presetss.uplog);
                     addServer(comboBox);
@@ -167,6 +165,54 @@ namespace userdata
             }
         }
         public Presets presetss;
+        public UpdateInfo updateInfo;
+
+        private async Task<UpdateInfo> GetUpdate(HttpClient httpClient)
+        {
+            string url = Getmirror("https://file.gldhn.top/file/json/update.json");
+            try
+            {
+                HttpResponseMessage response = await httpClient.GetAsync(url);
+                if (!response.IsSuccessStatusCode)
+                {
+                    Logger.Log($"[错误]请求{url}失败，状态码：{response.StatusCode}");
+                    return null;
+                }
+
+                string content = await response.Content.ReadAsStringAsync();
+                UpdateInfo update = JsonConvert.DeserializeObject<UpdateInfo>(content);
+                if (update == null)
+                    return null;
+
+                string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "bin", "update.json");
+                File.WriteAllText(path, content);
+                return update;
+            }
+            catch (Exception ex)
+            {
+                Logger.Log($"[错误]获取update.json失败：{ex.Message}");
+                return null;
+            }
+        }
+
+        public bool getupdate()
+        {
+            string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "bin", "update.json");
+            if (!File.Exists(path))
+                return false;
+
+            try
+            {
+                updateInfo = JsonConvert.DeserializeObject<UpdateInfo>(File.ReadAllText(path));
+                return updateInfo != null;
+            }
+            catch (Exception ex)
+            {
+                Logger.Log($"[错误]读取update.json失败：{ex.Message}");
+                return false;
+            }
+        }
+
         public bool getjson()
         {
             string absolutePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "bin", "preset.json");

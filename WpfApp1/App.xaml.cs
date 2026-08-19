@@ -147,19 +147,24 @@ namespace OPL_WpfApp
             }
             string savePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "bin", "nvb.zip");
             string saveOPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "bin", "openp2p.zip");
-            //string opPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "bin", "openp2p.exe");
             if (File.Exists(saveOPath))
             {
-                ExtractZipAndOverwrite(saveOPath, Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "bin"));
+                Net coreUpdate = new Net();
+                if (coreUpdate.getupdate() && !string.IsNullOrWhiteSpace(coreUpdate.updateInfo.ophash))
+                {
+                    string binPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "bin");
+                    ExtractZipAndOverwrite(saveOPath, binPath, Path.Combine(binPath, "openp2p.exe"), coreUpdate.updateInfo.ophash);
+                }
             }
             if (File.Exists(savePath))
             {
                 Net net = new Net();
-                net.getjson();
+                if (!net.getupdate())
+                    return;
                 string pathToExe = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "updata.exe");
                 ProcessStartInfo startInfo = new ProcessStartInfo();
                 startInfo.FileName = pathToExe;
-                startInfo.Arguments = net.presetss.uphash + " " +Process.GetCurrentProcess().MainModule.FileName;
+                startInfo.Arguments = net.updateInfo.uphash + " " +Process.GetCurrentProcess().MainModule.FileName;
                 startInfo.UseShellExecute = true;
                 startInfo.WorkingDirectory = Path.GetDirectoryName(pathToExe);
                 startInfo.CreateNoWindow = true; // 不显示新的命令行窗口
@@ -174,7 +179,7 @@ namespace OPL_WpfApp
                 }
             }
         }
-        public static void ExtractZipAndOverwrite(string zipPath, string extractPath)
+        public static bool ExtractZipAndOverwrite(string zipPath, string extractPath, string verifyPath = null, string expectedHash = null)
         {
             if (File.Exists(zipPath) && Directory.Exists(extractPath))
             {
@@ -210,19 +215,31 @@ namespace OPL_WpfApp
                             }
                         }
                     }
+
+                    if (expectedHash != null && !string.Equals(Net.CalculateMD5Hash(verifyPath), expectedHash, StringComparison.OrdinalIgnoreCase))
+                    {
+                        Console.WriteLine("解压后的文件 MD5 校验失败。");
+                        if (File.Exists(verifyPath)) File.Delete(verifyPath);
+                        File.Delete(zipPath);
+                        return false;
+                    }
+
                     Console.WriteLine("解压完成，更新完毕。");
                     File.Delete(zipPath);
+                    return true;
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine($"解压过程中发生错误: {ex.Message}");
+                    try { File.Delete(zipPath); } catch { }
+                    return false;
                 }
             }
             else
             {
                 Console.WriteLine("ZIP文件或目标文件夹不存在。");
+                return false;
             }
-
         }
         private static Assembly OnResolveAssembly(object sender, ResolveEventArgs args)
         {

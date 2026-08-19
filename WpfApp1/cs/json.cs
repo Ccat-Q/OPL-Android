@@ -429,6 +429,15 @@ namespace userdata
         public string ophash { get; set; }
         public List<servers> servers { get; set; }
     }
+    public class UpdateInfo
+    {
+        public int version { get; set; }
+        public string upurl { get; set; }
+        public string uphash { get; set; }
+        public string opversion { get; set; }
+        public string opurl { get; set; }
+        public string ophash { get; set; }
+    }
     public class servers
     {
         public string ServerHost { get; set; }
