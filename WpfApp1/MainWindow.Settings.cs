@@ -171,6 +171,18 @@ namespace OPL_WpfApp
             set.Write();
         }
 
+        private void CleanLog_ev(object sender, RoutedEventArgs e)
+        {
+            set.settings.CleanLogOnExit = true;
+            set.Write();
+        }
+
+        private void UnCleanLog_ev(object sender, RoutedEventArgs e)
+        {
+            set.settings.CleanLogOnExit = false;
+            set.Write();
+        }
+
         private void SetThene(string theme)
         {
             set.settings.Theme = theme;
@@ -237,6 +249,10 @@ namespace OPL_WpfApp
             {
                 minimize.IsChecked = true;
             }
+            if (set.settings.CleanLogOnExit)
+            {
+                CleanLogCheck.IsChecked = true;
+            }
             if (sjson.config.LogLevel == 2)
             {
                 sjson.config.LogLevel = 1;
@@ -259,6 +275,9 @@ namespace OPL_WpfApp
 
             minimize.Checked += Minimize_ev;
             minimize.Unchecked += Unminimize_ev;
+
+            CleanLogCheck.Checked += CleanLog_ev;
+            CleanLogCheck.Unchecked += UnCleanLog_ev;
 
             string newuuid;
             try

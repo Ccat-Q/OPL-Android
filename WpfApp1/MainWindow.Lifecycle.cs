@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Windows;
 using System.Windows.Input;
 using iNKORE.UI.WPF.Modern.Controls;
@@ -17,9 +18,16 @@ namespace OPL_WpfApp
         /// </summary>
         private void Show(object sender, EventArgs e)
         {
-            this.Show();
-            this.ShowInTaskbar = true;
-            this.WindowState = WindowState.Normal;
+            try
+            {
+                if (!this.IsVisible)
+                {
+                    this.Show();
+                    this.ShowInTaskbar = true;
+                    this.WindowState = WindowState.Normal;
+                }
+            }
+            catch { }
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -91,7 +99,23 @@ namespace OPL_WpfApp
             }
 
             ets?.Stop();
+            CleanLogOnExit();
             base.OnClosed(e);
+        }
+
+        private void CleanLogOnExit()
+        {
+            try
+            {
+                if (!set.settings.CleanLogOnExit) return;
+                string logDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "bin", "log");
+                if (!Directory.Exists(logDir)) return;
+                foreach (string file in Directory.GetFiles(logDir))
+                {
+                    try { File.Delete(file); } catch { }
+                }
+            }
+            catch { }
         }
 
         private static string ExtractBackgroundColor(string[] args)
