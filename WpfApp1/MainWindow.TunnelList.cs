@@ -24,7 +24,25 @@ namespace OPL_WpfApp
         {
             tcpnum = 0;
             ListBox listBox = this.FindName("sdlist") as ListBox;
+            if (listBox == null)
+            {
+                Logger.Log("[错误]刷新隧道列表失败：列表控件尚未初始化", "错误");
+                return;
+            }
+
+            if (sjson == null)
+            {
+                Logger.Log("[错误]刷新隧道列表失败：配置对象尚未初始化", "错误");
+                return;
+            }
+
             sjson.getjson();
+            if (sjson.config == null)
+            {
+                Logger.Log("[错误]刷新隧道列表失败：配置文件为空或无法读取", "错误");
+                return;
+            }
+
             listBox.Items.Clear();
             iplink.Clear();
             int index = 0;
@@ -32,6 +50,12 @@ namespace OPL_WpfApp
             {
                 foreach (userdata.App app in sjson.config.Apps)
                 {
+                    if (app == null)
+                    {
+                        Logger.Log("[警告]配置中存在空隧道项，已跳过", "警告");
+                        continue;
+                    }
+
                     if(app.Enabled == 1 ? true : false)
                         if(app.Protocol=="tcp") tcpnum++;
 
@@ -139,12 +163,17 @@ namespace OPL_WpfApp
                     checkBox.Unchecked += UnCheckBox_Checked;
                     grid.Children.Add(checkBox);
                     var clo = Brushes.Gray;
-                    tunellipse.Fill = clo;
+                    if (tunellipse != null)
+                        tunellipse.Fill = clo;
                     if (on&&app.Enabled==1)
                     {
-                        if (state[app.Protocol + ":" + app.SrcPort] == 1) clo = Brushes.Orange; 
-                        if(state[app.Protocol + ":" + app.SrcPort] == 2) clo = Brushes.Green;
-                        if (tunnel.getruning()) tunellipse.Fill = clo;
+                        string stateKey = app.Protocol + ":" + app.SrcPort;
+                        int appState = 0;
+                        state.TryGetValue(stateKey, out appState);
+                        if (appState == 1) clo = Brushes.Orange;
+                        if (appState == 2) clo = Brushes.Green;
+                        if (tunnel != null && tunnel.getruning() && tunellipse != null)
+                            tunellipse.Fill = clo;
                     }
                     Ellipse ellipse = new Ellipse
                     {

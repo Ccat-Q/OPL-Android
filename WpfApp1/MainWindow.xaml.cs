@@ -37,9 +37,15 @@ namespace OPL_WpfApp
             WindowHelper.CenterOnScreen(this);
             Logger logger = new Logger(richOutput);
             Uplog uplog = new Uplog(uplogbox);
-            this.DataContext = userData;
             userData = new userdata.UserData();
             sjson = new userdata.json();
+            if (sjson.config == null || sjson.config.Network == null)
+            {
+                Logger.Log("[错误]配置初始化失败，主窗口无法继续加载", "错误");
+                return;
+            }
+
+            this.DataContext = userData;
             OperatingSystem os = Environment.OSVersion;
             Version vers = os.Version;
             Logger.Log($"[信息] 程序启动，当前版本：{Getversion()}，更新包号：{Net.Getpvn()}，系统版本：{vers}");

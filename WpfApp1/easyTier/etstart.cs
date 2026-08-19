@@ -151,7 +151,7 @@ namespace OPL_WpfApp.easyTier
         }
         async Task DelayCheck()
         {
-            
+            int consecutiveEmptyOutputCount = 0;
            
             
             while (mainWindow.on)
@@ -195,6 +195,19 @@ namespace OPL_WpfApp.easyTier
                         pro.BeginOutputReadLine();
                         pro.WaitForExit();
                         //Logger.Log("【节点状态】: " + output + Environment.NewLine);
+                        if (string.IsNullOrWhiteSpace(output))
+                        {
+                            consecutiveEmptyOutputCount++;
+                            Logger.Log($"[警告]获取节点状态返回空输出（{consecutiveEmptyOutputCount}/3）");
+                            if (consecutiveEmptyOutputCount >= 3)
+                            {
+                                Logger.Log("[错误]连续3次获取节点状态为空，已退出网络");
+                                Stop();
+                            }
+                            return;
+                        }
+
+                        consecutiveEmptyOutputCount = 0;
                         NetworkNode[] node = null;
                         try
                         {

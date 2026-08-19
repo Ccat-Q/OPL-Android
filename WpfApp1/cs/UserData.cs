@@ -25,6 +25,13 @@ namespace userdata
             else
             {
                 json = new json();
+                if (json.config == null || json.config.Network == null)
+                {
+                    ResetUID();
+                    json.newjson(this);
+                    return;
+                }
+
                 UID = json.config.Network.Node;
                 if(UID == "auto")
                 {

@@ -251,7 +251,23 @@ namespace userdata
             try
             {
                 string jsonCont = File.ReadAllText(absolutePath);
-                config = JsonConvert.DeserializeObject<Config>(jsonCont);
+                Config loadedConfig = JsonConvert.DeserializeObject<Config>(jsonCont);
+                if (loadedConfig == null)
+                {
+                    Logger.Log("[错误]配置文件内容为空，保留当前配置", "错误");
+                    return;
+                }
+
+                if (loadedConfig.Network == null)
+                {
+                    Logger.Log("[错误]配置文件缺少网络配置，保留当前配置", "错误");
+                    return;
+                }
+
+                if (loadedConfig.Apps == null)
+                    loadedConfig.Apps = new List<App>();
+
+                config = loadedConfig;
 
                 //if (config.LogLevel != Ologv)
                 //{
@@ -262,8 +278,12 @@ namespace userdata
             }
             catch (JsonException je)
             {
-                // 如果JSON格式不正确，记录错误并返回null
-                Logger.Log($"Error while deserializing JSON: {je.Message}");
+                // 保留上一次有效配置，避免调用方收到空配置。
+                Logger.Log($"[错误]读取配置文件失败，保留当前配置：{je.Message}", "错误");
+            }
+            catch (IOException ioe)
+            {
+                Logger.Log($"[错误]读取配置文件失败，保留当前配置：{ioe.Message}", "错误");
             }
 
         }
