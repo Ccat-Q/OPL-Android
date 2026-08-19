@@ -280,6 +280,9 @@
     </ApplicationDefinition>
     <Compile Include="Utils\Logger.cs" />
     <Compile Include="Utils\WindowHelper.cs" />
+    <Compile Include="Controls\TunnelListItem.xaml.cs">
+      <DependentUpon>TunnelListItem.xaml</DependentUpon>
+    </Compile>
     <Compile Include="cs\AddMpPreference.cs" />
     <Compile Include="cs\Heart.cs" />
     <Compile Include="cs\Multicast.cs" />
@@ -315,6 +318,10 @@
     </Compile>
     <Compile Include="cs\UserData.cs" />
     <Page Include="AppColors.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\TunnelListItem.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -9,12 +9,14 @@
         ui:ThemeManager.IsThemeAware="True"
         ui:WindowHelper.SystemBackdropType="Mica"
         ui:WindowHelper.UseModernWindowStyle="True"
-        Title="预设" Height="183" Width="250" WindowStyle="ToolWindow">
-    <Grid>
-        <Label Content="UID:" HorizontalAlignment="Left" Margin="24,28,0,0" VerticalAlignment="Top" Height="25" ToolTip="房主的UID"/>
-        <TextBox HorizontalAlignment="Left" Name="SUID" Margin="71,21,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="169" Height="25" VerticalContentAlignment="Center"/>
-        <Label Content="游戏：" HorizontalAlignment="Left" Margin="24,65,0,0" VerticalAlignment="Top" Height="25"/>
-        <ComboBox Name="type" Margin="71,58,0,0" Width="169" VerticalContentAlignment="Center" SelectionChanged="ComboBox_SelectionChanged"/>
-        <Button Style="{StaticResource {x:Static ui:ThemeKeys.AccentButtonStyleKey}}" Content="添加" Margin="45,104,0,0" VerticalAlignment="Top" Height="35" Width="167" Click="Button_Click"/>
+        Title="预设" Height="320" Width="420" MinHeight="300" MinWidth="380" FontFamily="Segoe UI, Microsoft YaHei UI" FontSize="14">
+    <Grid Margin="24,18,24,20">
+        <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+        <TextBlock Text="从预设添加" FontSize="22" FontWeight="SemiBold" Margin="0,0,0,16"/>
+        <TextBlock Grid.Row="1" Text="房主 UID" Margin="0,0,0,6"/>
+        <TextBox Grid.Row="2" Name="SUID" ToolTip="输入房主的 UID"/>
+        <TextBlock Grid.Row="3" Text="游戏" Margin="0,14,0,6"/>
+        <ComboBox Grid.Row="4" Name="type" SelectionChanged="ComboBox_SelectionChanged"/>
+        <Button Grid.Row="6" Style="{StaticResource {x:Static ui:ThemeKeys.AccentButtonStyleKey}}" Content="添加预设隧道" Height="38" Click="Button_Click"/>
     </Grid>
 </Window>

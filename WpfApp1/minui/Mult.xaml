@@ -9,14 +9,14 @@
       ui:ThemeManager.IsThemeAware="True" 
       ui:WindowHelper.SystemBackdropType="Mica"
       ui:WindowHelper.UseModernWindowStyle="True"
-      Height="201" Width="354" WindowStyle="ToolWindow"
+      Height="260" Width="420" MinHeight="240" MinWidth="380" FontFamily="Segoe UI, Microsoft YaHei UI" FontSize="14"
       Title="自动生成联机码（仅MC）">
 
-    <Grid Margin="0,0,0,0">
-
-        <TextBox HorizontalAlignment="Left" Margin="124,43,0,0" TextWrapping="Wrap" Text="" Name="port_text" VerticalAlignment="Top" Width="154" Height="36"/>
-        <Label Content="端口：" HorizontalAlignment="Left" Margin="77,52,0,0" VerticalAlignment="Top"/>
-        <Button Content="确认" Margin="124,118,0,0" VerticalAlignment="Top" Width="104" Height="33" Click="Button_Click"/>
-
+    <Grid Margin="24,18,24,20">
+        <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+        <TextBlock Text="生成 Minecraft 联机码" FontSize="22" FontWeight="SemiBold" Margin="0,0,0,16"/>
+        <TextBlock Grid.Row="1" Text="游戏端口" Margin="0,0,0,6"/>
+        <TextBox Grid.Row="2" Text="" Name="port_text" Height="36"/>
+        <Button Grid.Row="4" Content="生成联机码" Height="38" Click="Button_Click"/>
     </Grid>
 </Window>

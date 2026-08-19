@@ -16,25 +16,21 @@
             </ResourceDictionary.MergedDictionaries>
             <Style TargetType="Button" x:Key="svg-button">
                 <Setter Property="SnapsToDevicePixels" Value="true"/>
-                <Setter Property="HorizontalAlignment" Value="Stretch"/>
-                <Setter Property="VerticalAlignment" Value="Stretch"/>
-                <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
+                <Setter Property="Cursor" Value="Hand"/>
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="Button">
-                            <Border Name="ButtonC"
-                                Background="Transparent" 
-                                CornerRadius="5"
-                                HorizontalAlignment="Stretch"
-                                VerticalAlignment="Stretch"
-                                >
-
-                                <ContentPresenter HorizontalAlignment="Center" 
-                                VerticalAlignment="Center"
-                                RecognizesAccessKey="True" />
-
+                            <Border x:Name="ButtonC" Background="Transparent" CornerRadius="5"
+                                    BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" RecognizesAccessKey="True"/>
                             </Border>
-
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="ButtonC" Property="Background" Value="#147F7F7F"/></Trigger>
+                                <Trigger Property="IsPressed" Value="True"><Setter TargetName="ButtonC" Property="Background" Value="#287F7F7F"/></Trigger>
+                                <Trigger Property="IsEnabled" Value="False"><Setter TargetName="ButtonC" Property="Opacity" Value="0.4"/></Trigger>
+                            </ControlTemplate.Triggers>
                         </ControlTemplate>
                     </Setter.Value>
                 </Setter>

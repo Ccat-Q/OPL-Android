@@ -9,32 +9,17 @@
         ui:ThemeManager.IsThemeAware="True"
         ui:WindowHelper.SystemBackdropType="Mica"
         ui:WindowHelper.UseModernWindowStyle="True"
-        Title="编辑隧道" Height="304" Width="250" WindowStyle="ToolWindow">
-    <Grid Margin="0,0,0,-1">
-        <Label Content="名称" HorizontalAlignment="Left" Margin="29,29,0,0" VerticalAlignment="Top" Height="25"/>
-        <TextBox HorizontalAlignment="Left" x:Name="names" Margin="85,22,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="155" Height="25" VerticalContentAlignment="Center" />
-        <Label Content="UID*" HorizontalAlignment="Left" Margin="29,64,0,0" VerticalAlignment="Top"/>
-        <TextBox  HorizontalAlignment="Left" Name="SUID" Margin="85,57,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="155" Height="25" VerticalContentAlignment="Center"/>
-        <Label Content="远程端口*" HorizontalAlignment="Left" Margin="20,98,0,0" VerticalAlignment="Top"/>
-        <TextBox  HorizontalAlignment="Left" Name="Sport" Margin="85,91,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="155" Height="25" VerticalContentAlignment="Center"/>
-        <Label Content="本地端口" HorizontalAlignment="Left" Margin="20,133,0,0" VerticalAlignment="Top" d:LayoutOverrides="Height"/>
-        <TextBox  HorizontalAlignment="Left" Name="Cport" Margin="85,126,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="155" Height="25" VerticalContentAlignment="Center"/>
-        <ComboBox  Name="type" Margin="85,161,0,0" Width="155" Height="32" VerticalContentAlignment="Center" SelectionChanged="ComboBox_SelectionChanged">
-            <ComboBoxItem Content="tcp"/>
-            <ComboBoxItem Content="udp"/>
-        </ComboBox>
-        <Label Content="协议*" HorizontalAlignment="Left" Margin="28,168,0,0" VerticalAlignment="Top"/>
-        <Button Content="保存" HorizontalAlignment="Center" Margin="0,216,0,0" VerticalAlignment="Top" Width="176" Height="35" Click="Button_Click" Style="{StaticResource {x:Static ui:ThemeKeys.AccentButtonStyleKey}}">
-            <!--<Button.Template>
-                <ControlTemplate TargetType="{x:Type Button}">
-                    <Border BorderBrush="{TemplateBinding Control.BorderBrush}" BorderThickness="1" CornerRadius="5">
-                        <Border.Background>#3FDDDDDD</Border.Background>
-                        <ContentPresenter Content="{TemplateBinding ContentControl.Content}" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                    </Border>
-                </ControlTemplate>
-            </Button.Template>-->
-        </Button>
-
-
+        Title="编辑隧道" Height="390" Width="420" MinHeight="360" MinWidth="390" FontFamily="Segoe UI, Microsoft YaHei UI" FontSize="14">
+    <Grid Margin="24,18,24,20">
+        <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+        <TextBlock Text="编辑隧道" FontSize="22" FontWeight="SemiBold" Margin="0,0,0,16"/>
+        <StackPanel Grid.Row="1">
+            <DockPanel Margin="0,5"><TextBlock Text="名称" Width="100" VerticalAlignment="Center"/><TextBox x:Name="names"/></DockPanel>
+            <DockPanel Margin="0,5"><TextBlock Text="UID *" Width="100" VerticalAlignment="Center"/><TextBox Name="SUID" ToolTip="房主 UID"/></DockPanel>
+            <DockPanel Margin="0,5"><TextBlock Text="远程端口 *" Width="100" VerticalAlignment="Center"/><TextBox Name="Sport"/></DockPanel>
+            <DockPanel Margin="0,5"><TextBlock Text="本地端口" Width="100" VerticalAlignment="Center"/><TextBox Name="Cport"/></DockPanel>
+            <DockPanel Margin="0,5"><TextBlock Text="协议 *" Width="100" VerticalAlignment="Center"/><ComboBox Name="type" SelectionChanged="ComboBox_SelectionChanged"><ComboBoxItem Content="tcp"/><ComboBoxItem Content="udp"/></ComboBox></DockPanel>
+        </StackPanel>
+        <Button Grid.Row="2" Content="保存更改" Height="38" Click="Button_Click" Style="{StaticResource {x:Static ui:ThemeKeys.AccentButtonStyleKey}}"/>
     </Grid>
 </Window>

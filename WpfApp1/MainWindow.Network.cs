@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -107,14 +109,7 @@ namespace OPL_WpfApp
 
         private void crearEtNet(object sender, RoutedEventArgs e)
         {
-            if (!etnode.Text.StartsWith("tcp://") && !etnode.Text.StartsWith("udp://"))
-            {
-                MessageBox.Show("请输入正确的节点地址", "提示");
-                return;
-            }
-            ets?.setlinkname(UID.Text);
-            newetuid.Text = UID.Text;
-            ets?.Open(etnode.Text);
+            StartEasyTier(UID.Text);
         }
 
         private void joinEtNet(object sender, RoutedEventArgs e)
@@ -124,14 +119,77 @@ namespace OPL_WpfApp
                 MessageBox.Show("请输入连接码或创建房间", "提示");
                 return;
             }
-            if (!etnode.Text.StartsWith("tcp://") && !etnode.Text.StartsWith("udp://"))
+            StartEasyTier(etNetText.Text);
+        }
+
+        private void StartEasyTier(string networkName)
+        {
+            if (!TryNormalizeEasyTierPeers(string.Join(",", EasyTierPeersList.Items.Cast<string>()), out string peers))
             {
-                MessageBox.Show("请输入正确的节点地址", "提示");
+                MessageBox.Show("请至少添加一个有效的 tcp:// 或 udp:// 节点地址。", "提示");
                 return;
             }
-            ets?.setlinkname(etNetText.Text);
-            newetuid.Text = etNetText.Text;
-            ets?.Open(etnode.Text);
+            ets?.setlinkname(networkName);
+            newetuid.Text = networkName;
+            ets?.Open(peers);
+        }
+
+        private void AddEasyTierPeer_Click(object sender, RoutedEventArgs e)
+        {
+            if (!TryNormalizeEasyTierPeers(EasyTierPeerInput.Text, out string peers))
+            {
+                MessageBox.Show("请输入有效的 tcp:// 或 udp:// 节点地址。", "提示");
+                return;
+            }
+            foreach (string peer in peers.Split(','))
+                if (!EasyTierPeersList.Items.Cast<string>().Any(item => string.Equals(item, peer, StringComparison.OrdinalIgnoreCase)))
+                    EasyTierPeersList.Items.Add(peer);
+            SaveEasyTierPeers();
+            EasyTierPeerInput.Clear();
+            EasyTierPeerInput.Focus();
+        }
+
+        private void RemoveEasyTierPeer_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button button && button.Tag is string peer)
+            {
+                EasyTierPeersList.Items.Remove(peer);
+                SaveEasyTierPeers();
+            }
+        }
+
+        private void SaveEasyTierPeers()
+        {
+            set.settings.EasyTierPeers = EasyTierPeersList.Items.Cast<string>().ToList();
+            set.Write();
+        }
+
+        private void EasyTierPeerInput_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key != Key.Enter) return;
+            AddEasyTierPeer_Click(sender, e);
+            e.Handled = true;
+        }
+
+        internal static bool TryNormalizeEasyTierPeers(string input, out string peers)
+        {
+            var nodes = new List<string>();
+            foreach (string raw in (input ?? "").Split(new[] { ',', ';', '\r', '\n' },
+                StringSplitOptions.RemoveEmptyEntries))
+            {
+                string node = raw.Trim().TrimEnd('/');
+                if (!Uri.TryCreate(node, UriKind.Absolute, out Uri uri) ||
+                    (uri.Scheme != "tcp" && uri.Scheme != "udp") ||
+                    string.IsNullOrWhiteSpace(uri.Host) || uri.Port < 1 || uri.Port > 65535)
+                {
+                    peers = null;
+                    return false;
+                }
+                if (!nodes.Exists(value => string.Equals(value, node, StringComparison.OrdinalIgnoreCase)))
+                    nodes.Add(node);
+            }
+            peers = string.Join(",", nodes);
+            return nodes.Count > 0;
         }
 
         private void leaveEtNet(object sender, RoutedEventArgs e)
@@ -142,12 +200,11 @@ namespace OPL_WpfApp
 
         private void EThelp(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("即将打开 easytier 官方节点监控页面\n如果你的延迟很高，你可以寻找负载较低的，最好找允许中转的，离你们近的节点填在下面\n注意你们需要使用相同的节点\n注意你们需要使用相同的节点\n节点是 tcp 或 udp 开头的，如：tcp://public.easytier.cn:11010", "提示");
             try
             {
-                Process.Start("https://uptime.easytier.cn/");
+                Process.Start("https://blog.gldhn.top/2026/07/02/opl_zw2/");
             }
-            catch { }
+            catch (Exception ex) { Logger.Log($"[错误]打开 EasyTier 帮助失败：{ex.Message}"); }
         }
 
         private void ServersCombo_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)

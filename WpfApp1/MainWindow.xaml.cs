@@ -34,6 +34,9 @@ namespace OPL_WpfApp
         public MainWindow_opl(string[] args)
         {
             InitializeComponent();
+            if (set.settings.EasyTierPeers != null)
+                foreach (string peer in set.settings.EasyTierPeers)
+                    EasyTierPeersList.Items.Add(peer);
             WindowHelper.CenterOnScreen(this);
             Logger logger = new Logger(richOutput);
             Uplog uplog = new Uplog(uplogbox);

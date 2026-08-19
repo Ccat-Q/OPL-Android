@@ -457,6 +457,9 @@ namespace userdata
         public string opversion { get; set; }
         public string opurl { get; set; }
         public string ophash { get; set; }
+        public string etversion { get; set; }
+        public string eturl { get; set; }
+        public string ethash { get; set; }
     }
     public class servers
     {

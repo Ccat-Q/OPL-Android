@@ -103,6 +103,30 @@ namespace OPL_WpfApp
             set.Write();
         }
 
+        private void Autoup_et(object sender, RoutedEventArgs e)
+        {
+            set.settings.Auto_upet = true;
+            set.Write();
+        }
+
+        private void UnAutoup_et(object sender, RoutedEventArgs e)
+        {
+            MessageBoxResult result = MessageBox.Show(
+                "确定要关闭 EasyTier 核心自动更新吗？旧版本可能无法使用新节点或新协议。",
+                "警告",
+                MessageBoxButton.OKCancel,
+                MessageBoxImage.Question);
+            if (result == MessageBoxResult.OK)
+            {
+                set.settings.Auto_upet = false;
+                set.Write();
+            }
+            else
+            {
+                Autoup_etn.IsChecked = true;
+            }
+        }
+
         private void UnAutoup(object sender, RoutedEventArgs e)
         {
             MessageBoxResult result = MessageBox.Show(
@@ -221,6 +245,10 @@ namespace OPL_WpfApp
             {
                 Autoup_opn.IsChecked = true;
             }
+            if (set.settings.Auto_upet)
+            {
+                Autoup_etn.IsChecked = true;
+            }
             if(set.settings.Auto_up)
             {
                 Autoupn.IsChecked = true;
@@ -263,6 +291,9 @@ namespace OPL_WpfApp
 
             Autoup_opn.Checked += Autoup_op;
             Autoup_opn.Unchecked += UnAutoup_op;
+
+            Autoup_etn.Checked += Autoup_et;
+            Autoup_etn.Unchecked += UnAutoup_et;
 
             Autoupn.Checked += Autoup;
             Autoupn.Unchecked += UnAutoup;

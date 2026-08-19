@@ -25,8 +25,6 @@ namespace OPL_WpfApp.easyTier
         public etstart(MainWindow_opl mainWindow)
         {
             this.mainWindow = mainWindow;
-            if (!File.Exists(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "bin", "easytier-windows-x86_64", name)) || !File.Exists(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "bin", "easytier-windows-x86_64", infoname)))
-                new Updata(Net.Getmirror("https://file.gldhn.top/file/easytier-windows-x86_64-v2.3.2.zip"), "easytier.zip", Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "bin"), true);
         }
         public void Open(string node)
         {
@@ -35,15 +33,27 @@ namespace OPL_WpfApp.easyTier
                 MessageBox.Show("请先关闭主程序再启动，本模块与原始模块独立", "警告");
                 return;
             }
+            string corePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "bin",
+                "easytier-windows-x86_64", name);
+            string cliPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "bin",
+                "easytier-windows-x86_64", infoname);
+            if (!File.Exists(corePath) || !File.Exists(cliPath))
+            {
+                MessageBox.Show("EasyTier 核心正在下载或下载失败，请稍后重试。", "提示");
+                return;
+            }
             mainWindow.on = true;
             mainWindow.eton = true;
             // 创建进程对象
             ProcessStartInfo startInfo = new ProcessStartInfo();
-            startInfo.FileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "bin", "easytier-windows-x86_64", name); // 控制台应用路径
+            startInfo.FileName = corePath; // 控制台应用路径
             startInfo.RedirectStandardOutput = true;
             startInfo.StandardOutputEncoding = Encoding.UTF8;
             startInfo.StandardErrorEncoding = Encoding.UTF8;
-            startInfo.Arguments = "-d --network-name " + linkname + " --network-secret " + linkname + " -p "+ node +" --multi-thread --enable-kcp-proxy --use-smoltcp --enable-quic-proxy";
+            string safeLinkName = linkname.Replace("\"", "");
+            startInfo.Arguments = "-d --network-name \"" + safeLinkName + "\" --network-secret \"" +
+                safeLinkName + "\" -p \"" + node +
+                "\" --multi-thread --enable-kcp-proxy --use-smoltcp --enable-quic-proxy";
             startInfo.RedirectStandardError = true;
             startInfo.UseShellExecute = false;
             startInfo.CreateNoWindow = true; // 不显示新的命令行窗口
@@ -266,10 +276,7 @@ namespace OPL_WpfApp.easyTier
                                     IpAddress = IP,
                                     RxData = n.RxBytes,
                                     TxData = n.TxBytes,
-                                    Background = System.Windows.Media.Brushes.White,
                                     BorderBrush = bb,
-                                    BorderThickness = new System.Windows.Thickness(1),
-                                    Margin = new Thickness(5),
                                     LatMs = n.LatMs + "ms"
                                 };
                                 mainWindow.NetworkList.Items.Add(networkInfo);

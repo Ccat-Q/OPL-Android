@@ -79,6 +79,7 @@ namespace userdata
         public string Theme { get; set; } // 主题("Light" 或 "Dark")
         public string csproduct { get; set; } //BIOSUID
         public bool Auto_upop { get; set; } = true; // 自动更新openp2p
+        public bool Auto_upet { get; set; } = true; // 自动更新EasyTier
         public bool Auto_up { get; set; } = true;  // 自动更新s
         public bool Auto_open { get; set; } = false; //运行后自动启动
         public bool ispwarning { get; set; } = true; // 获取isp
@@ -86,6 +87,8 @@ namespace userdata
         public bool qusminimize { get; set; } = true;  //是否询问最小化到托盘
         public bool CleanLogOnExit { get; set; } = false; // 退出时清理日志缓存
         public bool beta { get; set; } = false;
+        [JsonProperty(ObjectCreationHandling = ObjectCreationHandling.Replace)]
+        public List<string> EasyTierPeers { get; set; } = new List<string> { "tcp://p.gldhn.top:11010" };
         public List<ispinfo> ispinfos { get; set; } = new List<ispinfo>();
         public string LastNoticeTime { get; set; } = ""; // 上次已读公告的时间
     }

@@ -9,11 +9,12 @@
         ui:WindowHelper.SystemBackdropType="Mica"
         ui:WindowHelper.UseModernWindowStyle="True"
         xmlns:local="clr-namespace:OPL_WpfApp.minui"
-        Title="手动复制窗口" Height="287" Width="373">
-    <Grid >
-        <TextBox HorizontalAlignment="Center" Margin="0,18,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" Height="148" Width="353" Name="copybox" IsReadOnly="True"/>
-        <Button Content="关闭" Margin="0,207,0,0" VerticalAlignment="Top" Click="Button_Click" HorizontalAlignment="Center"/>
-        <Label Content="由于自动可能复制失败了，请手动选择上面文本进行复制&#xD;&#xA;（也可能复制成功了）" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,166,0,0" />
-
+        Title="手动复制" Height="320" Width="480" MinHeight="280" MinWidth="400" FontFamily="Segoe UI, Microsoft YaHei UI" FontSize="14">
+    <Grid Margin="24,18,24,20">
+        <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+        <TextBlock Text="手动复制联机码" FontSize="22" FontWeight="SemiBold" Margin="0,0,0,16"/>
+        <TextBox Grid.Row="1" TextWrapping="Wrap" Text="TextBlock" Name="copybox" IsReadOnly="True" VerticalScrollBarVisibility="Auto"/>
+        <TextBlock Grid.Row="2" Text="若自动复制失败，请选中上方文本后按 Ctrl+C。" Margin="0,12,0,12" Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"/>
+        <Button Grid.Row="3" Content="关闭" Click="Button_Click" HorizontalAlignment="Right" Width="100"/>
     </Grid>
 </Window>

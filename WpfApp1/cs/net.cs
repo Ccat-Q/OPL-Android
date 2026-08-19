@@ -93,6 +93,25 @@ namespace userdata
                                 MainWindow_opl.over = false;
                             }
                         }
+                        string etPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "bin",
+                            "easytier-windows-x86_64", "easytier-core.exe");
+                        if (!string.IsNullOrWhiteSpace(updateInfo.eturl) &&
+                            !string.IsNullOrWhiteSpace(updateInfo.ethash) &&
+                            (!File.Exists(etPath) || !string.Equals(CalculateMD5Hash(etPath), updateInfo.ethash,
+                                StringComparison.OrdinalIgnoreCase)))
+                        {
+                            if (!set.settings.Auto_upet)
+                            {
+                                Logger.Log("[提示]EasyTier 核心不是最新版本，但自动更新已关闭");
+                            }
+                            else
+                            {
+                                string binPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "bin");
+                                new Updata(Getmirror(updateInfo.eturl), "easytier.zip", binPath, true,
+                                    updateInfo.ethash, etPath);
+                                Logger.Log("[提示]EasyTier 核心不是最新版本，开始后台下载更新包");
+                            }
+                        }
                     }
                     Uplog.Log(presetss.uplog);
                     addServer(comboBox);
@@ -277,7 +296,7 @@ namespace userdata
                 //}
             }
         }
-        public async Task<List<notice>> Getnotice(TextBox text)
+        public async Task<List<notice>> Getnotice(ItemsControl list)
         {
             Logger.Log($"[信息]开始获取公告...");
             string url = "https://file.gldhn.top/file/json/notice.json";
@@ -297,14 +316,7 @@ namespace userdata
                     Logger.Log($"[提示]获取公告成功");
                     string contentString = await response.Content.ReadAsStringAsync();
                     var notices = JsonConvert.DeserializeObject<noticejson>(contentString);
-                    //string info = "*********************************公告*********************************\n";
-                    string info = "";
-                    foreach (notice item in notices.notices)
-                    {
-                        info = $"{item.title}                         {item.time}\n{item.content}\n*************************************************************************\n" + info;
-                    }
-                    info = "********************************OPL公告*********************************\n" + info;
-                    text.Text = info;
+                    list.ItemsSource = notices.notices.AsEnumerable().Reverse();
                     return notices.notices;
 
                 }
@@ -312,11 +324,11 @@ namespace userdata
             catch (Exception ex)
             {
                 Logger.Log($"[错误]请求{url}过程中发生错误：{ex.Message}");
-                text.Text = "获取失败";
+                list.ItemsSource = new[] { new notice { title = "公告获取失败", content = "请检查网络连接后重启应用。" } };
                 if (!ismirror)
                 {
                     ismirror = true;
-                    return await Getnotice(text);
+                    return await Getnotice(list);
                 }
             }
             return null;
