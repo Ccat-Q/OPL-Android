@@ -1,0 +1,11 @@
+{
+  "version": 0,
+  "upurl": "https://file.gldhn.top/file/uppack/APP_VERSION-PVN.zip",
+  "uphash": "APP_PACKAGE_MD5",
+  "opversion": "OPENP2P_VERSION",
+  "opurl": "https://file.gldhn.top/file/openp2p-OPENP2P_VERSION.windows-386.zip",
+  "ophash": "OPENP2P_EXE_MD5",
+  "etversion": "EASYTIER_VERSION",
+  "eturl": "https://file.gldhn.top/file/easytier-EASYTIER_VERSION.windows-x86_64.zip",
+  "ethash": "EASYTIER_CORE_EXE_MD5"
+}
