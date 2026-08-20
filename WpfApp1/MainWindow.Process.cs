@@ -115,6 +115,7 @@ namespace OPL_WpfApp
             openbutton.Content = "关闭";
             Logger.Log("-----------------------程序已开始运行请耐心等待隧道连接----------------------------","提示");
             fstert.Fill = Brushes.Orange;
+            ServiceStatusText.Text = "正在连接";
             on = true;
             fsterto = false;
             Relist();
@@ -196,6 +197,7 @@ namespace OPL_WpfApp
             Logger.Log("[提示]----------------------------------程序已停止运行----------------------------------");
             process = null;
             fstert.Fill = Brushes.Gray;
+            ServiceStatusText.Text = "服务未启动";
             Multicast.Stop();
             state.Clear();
             on = false;
@@ -218,6 +220,7 @@ namespace OPL_WpfApp
             {
                 Logger.Log("[提示] 程序启动完毕，请耐心等待隧道连接");
                 fstert.Fill = Brushes.Green;
+                ServiceStatusText.Text = "服务已连接";
                 fsterto = true;
                 fsterton = 0;
             }
@@ -225,6 +228,7 @@ namespace OPL_WpfApp
             {
                 Logger.Log("[提示] 程序离线，请检查你的网络设置或查看网络连接是否正常");
                 fstert.Fill = Brushes.Orange;
+                ServiceStatusText.Text = "连接已中断";
                 fsterto = false;
             }
             if (m.Contains("LISTEN ON PORT"))

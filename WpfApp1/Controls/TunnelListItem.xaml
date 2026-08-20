@@ -17,11 +17,11 @@
         </Border.RenderTransform>
         <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="2*" MinWidth="150"/>
+                <ColumnDefinition Width="*" MinWidth="90"/>
+                <ColumnDefinition Width="1.5*" MinWidth="150"/>
+                <ColumnDefinition Width="Auto" MinWidth="96"/>
+                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -51,7 +51,7 @@
                           Checked="EnabledCheckBox_Changed" Unchecked="EnabledCheckBox_Changed"/>
             </StackPanel>
 
-            <StackPanel Grid.Column="4" Grid.RowSpan="2" Orientation="Horizontal" VerticalAlignment="Center">
+            <StackPanel Grid.Column="4" Grid.RowSpan="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="12,0,0,0">
                 <Button x:Name="EditButton" Content="编辑" Click="Edit_Click" Margin="0,0,6,0"/>
                 <Button x:Name="DeleteButton" Content="删除" Click="Delete_Click" Margin="0,0,6,0" ToolTip="删除后无法恢复"/>
                 <Border x:Name="DragHandle" Width="36" Height="36" Background="Transparent" Cursor="SizeAll"

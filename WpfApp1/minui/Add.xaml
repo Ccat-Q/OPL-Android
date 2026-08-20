@@ -9,39 +9,36 @@
         ui:WindowHelper.SystemBackdropType="Mica"
         ui:WindowHelper.UseModernWindowStyle="True"
         mc:Ignorable="d"
-        MinHeight="360" MinWidth="390" FontFamily="Segoe UI, Microsoft YaHei UI" FontSize="14"
-        Title="添加隧道" Height="380" Width="420" SizeToContent="Manual">
+        MinHeight="440" MinWidth="440" FontFamily="Segoe UI, Microsoft YaHei UI" FontSize="14"
+        Title="添加隧道" Height="440" Width="460" ResizeMode="NoResize" ShowInTaskbar="False">
         <Grid Margin="24,18,24,20">
             <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
-            <TextBlock Text="添加隧道" FontSize="22" FontWeight="SemiBold" Margin="0,0,0,16"/>
-            <StackPanel Grid.Row="1">
-                <DockPanel LastChildFill="True" Margin="0,5">
-                    <Label Content="名称" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                    <TextBox VerticalContentAlignment="Center"  HorizontalAlignment="Right" x:Name="names"  TextWrapping="Wrap" Text="自定义" VerticalAlignment="Top" Width="158" Height="25"/>
-                </DockPanel>
-                <DockPanel LastChildFill="True" Margin="0,5">
-                    <Label Content="UID*" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="输入房主的UID"/>
-                    <TextBox VerticalContentAlignment="Center"  HorizontalAlignment="Right" Name="SUID" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="158" Height="25"/>
-                </DockPanel>
-                <DockPanel LastChildFill="True" Margin="0,5">
-                    <Label Content="远程端口*" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="输入房主游戏对外开放的端口"/>
-                    <TextBox HorizontalContentAlignment="Left" VerticalContentAlignment="Center"  HorizontalAlignment="Right" Name="Sport" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="158" TextChanged="Sport_TextChanged" Height="25"/>
-                </DockPanel>
-                <DockPanel LastChildFill="True" Margin="0,5">
-                    <Label Content="本地端口" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                    <TextBox HorizontalContentAlignment="Left" VerticalContentAlignment="Center"  HorizontalAlignment="Right" Name="Cport" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="158" Height="25"/>
-                </DockPanel>
-                <DockPanel LastChildFill="True" Margin="0,5" >
-                    <Label Content="协议*" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="MC选择TCP"/>
-                    <ComboBox HorizontalContentAlignment="Left"  HorizontalAlignment="Right" VerticalContentAlignment="Center" Name="type" Width="158" SelectionChanged="ComboBox_SelectionChanged">
+            <StackPanel>
+                <TextBlock Text="添加隧道" FontSize="22" FontWeight="SemiBold"/>
+                <TextBlock Text="带 * 的项目为必填项" Margin="0,4,0,18"
+                           Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"/>
+            </StackPanel>
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions><ColumnDefinition Width="112"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                <Grid.RowDefinitions><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/></Grid.RowDefinitions>
+                <Label Content="名称" Target="{Binding ElementName=names}" VerticalAlignment="Center"/>
+                <TextBox Grid.Column="1" x:Name="names" Text="自定义" MinHeight="36" VerticalContentAlignment="Center"/>
+                <Label Grid.Row="1" Content="UID *" Target="{Binding ElementName=SUID}" VerticalAlignment="Center" ToolTip="输入房主的 UID"/>
+                <TextBox Grid.Row="1" Grid.Column="1" x:Name="SUID" MinHeight="36" VerticalContentAlignment="Center"/>
+                <Label Grid.Row="2" Content="远程端口 *" Target="{Binding ElementName=Sport}" VerticalAlignment="Center" ToolTip="输入房主游戏对外开放的端口"/>
+                <TextBox Grid.Row="2" Grid.Column="1" x:Name="Sport" MinHeight="36" VerticalContentAlignment="Center" TextChanged="Sport_TextChanged"/>
+                <Label Grid.Row="3" Content="本地端口" Target="{Binding ElementName=Cport}" VerticalAlignment="Center"/>
+                <TextBox Grid.Row="3" Grid.Column="1" x:Name="Cport" MinHeight="36" VerticalContentAlignment="Center"/>
+                <Label Grid.Row="4" Content="协议 *" Target="{Binding ElementName=type}" VerticalAlignment="Center" ToolTip="Minecraft 请选择 TCP"/>
+                <ComboBox Grid.Row="4" Grid.Column="1" x:Name="type" MinHeight="36" VerticalContentAlignment="Center" SelectionChanged="ComboBox_SelectionChanged">
                         <ComboBoxItem Content="tcp" IsSelected="True"/>
                         <ComboBoxItem Content="udp"/>
-                    </ComboBox>
-                </DockPanel>
-            </StackPanel>
-            <Grid Grid.Row="2" Margin="0,16,0,0"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="8"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
-                <Button Content="使用预设" Height="38" Click="Preset"/>
-                <Button Grid.Column="2" Content="添加隧道" Height="38" Click="Button_Click" Style="{StaticResource {x:Static ui:ThemeKeys.AccentButtonStyleKey}}"/>
+                </ComboBox>
+            </Grid>
+            <Grid Grid.Row="2" Margin="0,18,0,0"><Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="8"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                <Button Content="使用预设" MinWidth="96" Height="38" Click="Preset"/>
+                <Button Grid.Column="2" Content="取消" MinWidth="80" Height="38" IsCancel="True"/>
+                <Button Grid.Column="4" Content="添加隧道" MinWidth="112" Height="38" Click="Button_Click" IsDefault="True" Style="{StaticResource {x:Static ui:ThemeKeys.AccentButtonStyleKey}}"/>
             </Grid>
         </Grid>
 </Window>

@@ -87,18 +87,40 @@
                                     Style="{StaticResource {x:Static ui:ThemeKeys.AccentButtonStyleKey}}"/>
                         </Grid>
                     </Border>
-                    <ListBox Grid.Row="2" x:Name="sdlist"
-                             Background="Transparent" BorderThickness="0" Padding="0"
-                             HorizontalContentAlignment="Stretch"
-                             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                             ScrollViewer.CanContentScroll="True" VirtualizingStackPanel.IsVirtualizing="True"
-                             AutomationProperties.Name="隧道列表">
-                        <ListBox.ItemContainerStyle>
-                            <Style TargetType="ListBoxItem">
-                                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-                            </Style>
-                        </ListBox.ItemContainerStyle>
-                    </ListBox>
+                    <Grid Grid.Row="2">
+                        <ListBox x:Name="sdlist"
+                                 Background="Transparent" BorderThickness="0" Padding="0"
+                                 HorizontalContentAlignment="Stretch"
+                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                 ScrollViewer.CanContentScroll="True" VirtualizingStackPanel.IsVirtualizing="True"
+                                 AutomationProperties.Name="隧道列表">
+                            <ListBox.ItemContainerStyle>
+                                <Style TargetType="ListBoxItem">
+                                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                </Style>
+                            </ListBox.ItemContainerStyle>
+                        </ListBox>
+                        <Border Padding="32" IsHitTestVisible="False">
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Items.Count, ElementName=sdlist}" Value="0">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" MaxWidth="360">
+                                <ui:FontIcon Icon="{x:Static ui:FluentSystemIcons.LinkAdd_24_Regular}"
+                                             FontSize="32" Opacity="0.7" HorizontalAlignment="Center"/>
+                                <TextBlock Text="还没有隧道" FontSize="18" FontWeight="SemiBold"
+                                           TextAlignment="Center" Margin="0,12,0,6"/>
+                                <TextBlock Text="点击“新建连接”，或从剪贴板中的联机码快速添加。"
+                                           Style="{StaticResource Caption}" TextAlignment="Center"/>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
                 </Grid>
             </TabItem>
 
@@ -342,13 +364,15 @@
 
         <Border Grid.Row="1" BorderBrush="#327F7F7F" BorderThickness="0,1,0,0" Padding="16,10">
             <Grid>
-                <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                 <Ellipse x:Name="fstert" Fill="Gray" Stroke="#667F7F7F" Width="10" Height="10" Margin="0,0,8,0"/>
-                <Label Grid.Column="1" x:Name="ver" Content="v1.0.1.9" Padding="0" VerticalAlignment="Center"/>
-                <Button Grid.Column="3" Content="导出连接码" Click="Outlist" Margin="0,0,8,0"/>
-                <Button Grid.Column="4" Content="生成联机码" Click="Multput" Margin="0,0,8,0"/>
-                <Button Grid.Column="5" x:Name="CloseAllButton" Content="关闭所有隧道" Click="CloseAll" Margin="0,0,8,0"/>
-                <Button Grid.Column="6" x:Name="openbutton" Content="启动" Click="Button_Click_open" Width="112" Style="{StaticResource {x:Static ui:ThemeKeys.AccentButtonStyleKey}}"/>
+                <TextBlock Grid.Column="1" x:Name="ServiceStatusText" Text="服务未启动" VerticalAlignment="Center"/>
+                <Label Grid.Column="2" x:Name="ver" Content="v1.0.1.9" Padding="12,0,0,0" VerticalAlignment="Center"
+                       Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"/>
+                <Button Grid.Column="4" Content="导出连接码" Click="Outlist" Margin="0,0,8,0"/>
+                <Button Grid.Column="5" Content="生成联机码" Click="Multput" Margin="0,0,8,0"/>
+                <Button Grid.Column="6" x:Name="CloseAllButton" Content="关闭所有隧道" Click="CloseAll" Margin="0,0,8,0"/>
+                <Button Grid.Column="7" x:Name="openbutton" Content="启动" Click="Button_Click_open" Width="112" Style="{StaticResource {x:Static ui:ThemeKeys.AccentButtonStyleKey}}"/>
             </Grid>
         </Border>
     </Grid>
