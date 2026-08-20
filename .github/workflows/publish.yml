@@ -144,7 +144,7 @@ jobs:
           $goMod = $goMod -replace '(?m)^toolchain .+\r?\n?', ''
           Set-Content go120.mod $goMod -NoNewline
           Copy-Item go.sum go120.sum
-          go build -modfile=go120.mod -trimpath -ldflags="-s -w" -o ..\openp2p.exe cmd/openp2p.go
+          go build "-modfile=go120.mod" -trimpath -ldflags="-s -w" -o ..\openp2p.exe cmd/openp2p.go
           $coreZip = "openp2p-${{ needs.check.outputs.core_version }}.windows-386.zip"
           Compress-Archive ..\openp2p.exe ..\$coreZip -Force
           "zip=$coreZip" >> $env:GITHUB_OUTPUT
