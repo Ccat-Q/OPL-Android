@@ -17,33 +17,28 @@ namespace OPL_WpfApp.easyTier
         {
             var nodes = new List<NetworkNode>();
 
-            // 按行分割
             var lines = input.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None)
                              .Select(x => x.Trim())
-                             .Where(x => !string.IsNullOrEmpty(x) && x.StartsWith("│"))
+                             .Where(x => x.StartsWith("|") || x.StartsWith("│"))
+                             .Where(x => !x.StartsWith("|-") && !x.StartsWith("├") && !x.StartsWith("└"))
                              .ToArray();
 
             if (lines.Length == 0) throw new ArgumentException("输入为空或格式不正确");
 
-            // 提取表头（第一行）
-            string headerLine = lines[0];
-            string[] headers = SplitLine(headerLine);
+            string[] headers = SplitLine(lines[0]);
+            int ipv4Idx = FindHeader(headers, "ipv4");
+            int hostnameIdx = FindHeader(headers, "hostname");
+            int costIdx = FindHeader(headers, "cost");
+            int latMsIdx = FindHeader(headers, "lat(ms)", "lat_ms");
+            int lossRateIdx = FindHeader(headers, "loss_rate");
+            int rxBytesIdx = FindHeader(headers, "rx", "rx_bytes");
+            int txBytesIdx = FindHeader(headers, "tx", "tx_bytes");
+            int tunnelProtoIdx = FindHeader(headers, "tunnel", "tunnel_proto");
+            int natTypeIdx = FindHeader(headers, "nat", "nat_type");
+            int idIdx = FindHeader(headers, "id");
+            int versionIdx = FindHeader(headers, "version");
 
-            // 查找列索引（防止列顺序变化）
-            int ipv4Idx = Array.IndexOf(headers, "ipv4");
-            int hostnameIdx = Array.IndexOf(headers, "hostname");
-            int costIdx = Array.IndexOf(headers, "cost");
-            int latMsIdx = Array.IndexOf(headers, "lat_ms");
-            int lossRateIdx = Array.IndexOf(headers, "loss_rate");
-            int rxBytesIdx = Array.IndexOf(headers, "rx_bytes");
-            int txBytesIdx = Array.IndexOf(headers, "tx_bytes");
-            int tunnelProtoIdx = Array.IndexOf(headers, "tunnel_proto");
-            int natTypeIdx = Array.IndexOf(headers, "nat_type");
-            int idIdx = Array.IndexOf(headers, "id");
-            int versionIdx = Array.IndexOf(headers, "version");
-
-            // 验证关键列是否存在
-            if (ipv4Idx == -1 || idIdx == -1)
+            if (ipv4Idx == -1 || hostnameIdx == -1)
                 throw new InvalidOperationException("表头缺少必要字段");
 
             // 解析数据行（跳过第一行表头）
@@ -51,16 +46,18 @@ namespace OPL_WpfApp.easyTier
             {
                 string[] cells = SplitLine(lines[i]);
 
-                // 防止越界
-                if (cells.Length < headers.Length)
-                {
-                    Array.Resize(ref cells, headers.Length); // 补齐缺失列
-                }
+                if (cells.Length == 0) continue;
+
+                string ipv4 = SafeGet(cells, ipv4Idx);
+                int cidrIndex = ipv4.IndexOf('/');
+                if (cidrIndex >= 0) ipv4 = ipv4.Substring(0, cidrIndex);
+                string hostname = SafeGet(cells, hostnameIdx);
+                if (string.IsNullOrWhiteSpace(ipv4) || string.IsNullOrWhiteSpace(hostname)) continue;
 
                 var node = new NetworkNode
                 {
-                    Ipv4 = SafeGet(cells, ipv4Idx),
-                    Hostname = SafeGet(cells, hostnameIdx),
+                    Ipv4 = ipv4,
+                    Hostname = hostname,
                     Cost = SafeGet(cells, costIdx),
                     LatMs = SafeGet(cells, latMsIdx),
                     LossRate = SafeGet(cells, lossRateIdx),
@@ -79,11 +76,17 @@ namespace OPL_WpfApp.easyTier
         }
         private static string[] SplitLine(string line)
         {
-            return line
-                .Split('│')
-                .Select(x => x.Trim())
-                .Where(x => x.Length > 0) // 去除首尾空项
-                .ToArray();
+            char separator = line.IndexOf('│') >= 0 ? '│' : '|';
+            var parts = line.Split(separator).Select(x => x.Trim()).ToList();
+            if (parts.Count > 0 && parts[0].Length == 0) parts.RemoveAt(0);
+            if (parts.Count > 0 && parts[parts.Count - 1].Length == 0) parts.RemoveAt(parts.Count - 1);
+            return parts.ToArray();
+        }
+
+        private static int FindHeader(string[] headers, params string[] names)
+        {
+            return Array.FindIndex(headers, header =>
+                names.Any(name => string.Equals(header, name, StringComparison.OrdinalIgnoreCase)));
         }
 
         // 安全获取，越界返回空字符串
@@ -115,7 +118,8 @@ namespace OPL_WpfApp.easyTier
 
         public override string ToString()
         {
-            return $"IPv4: {Ipv4}, Hostname: {Hostname}, Cost: {Cost}, Latency: {LatMs} ms, NAT: {NatType}, ID: {Id}";
+            return string.Format("IPv4: {0}, Hostname: {1}, Cost: {2}, Latency: {3} ms, NAT: {4}, ID: {5}",
+                Ipv4, Hostname, Cost, LatMs, NatType, Id);
         }
     }
 }

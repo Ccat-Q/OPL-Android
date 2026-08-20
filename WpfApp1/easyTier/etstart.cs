@@ -183,17 +183,13 @@ namespace OPL_WpfApp.easyTier
 
                     Process pro = new Process();
                     pro.StartInfo = Info;
-                    int count = 0;
                     // 设置输出数据接收事件
                     pro.OutputDataReceived += new DataReceivedEventHandler((sender, e) =>
                     {
                         if (!string.IsNullOrEmpty(e.Data))
                         {
-                            if (count % 2 != 0) {
-                                if (output == "") output = e.Data;
-                                else output += (Environment.NewLine + e.Data);
-                            }
-                            count++;
+                            if (output == "") output = e.Data;
+                            else output += Environment.NewLine + e.Data;
                             
                         }
                     });
@@ -238,7 +234,7 @@ namespace OPL_WpfApp.easyTier
                             {
                                 Brush bb;
                             //string rx = "0",tx = "0";
-                                if (n.Cost == "Local")
+                                if (string.Equals(n.Cost, "Local", StringComparison.OrdinalIgnoreCase))
                                 {
                                     bb = System.Windows.Media.Brushes.Green;
                                 }
@@ -265,11 +261,7 @@ namespace OPL_WpfApp.easyTier
                             //    tx = 0;
                             //}
                             if (n.Hostname == "p2p") continue;
-                            string IP = "-";
-                            if (n.Ipv4.Length > 3)
-                            {
-                                IP = n.Ipv4.Substring(0, n.Ipv4.Length - 3);
-                            }
+                            string IP = string.IsNullOrWhiteSpace(n.Ipv4) ? "-" : n.Ipv4;
                                 var networkInfo = new etinfo
                                 {
                                     Hostname = n.Hostname,
