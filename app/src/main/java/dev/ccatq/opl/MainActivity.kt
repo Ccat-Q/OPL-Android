@@ -1,6 +1,9 @@
 package dev.ccatq.opl
 
 import android.os.Bundle
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
@@ -77,6 +80,11 @@ private fun OplApp() {
                         Text("本机 UID", style = MaterialTheme.typography.labelLarge)
                         Text(state.uid, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            OutlinedButton(onClick = {
+                                context.getSystemService(ClipboardManager::class.java)
+                                    .setPrimaryClip(ClipData.newPlainText("OPL UID", state.uid))
+                                Toast.makeText(context, "UID 已复制", Toast.LENGTH_SHORT).show()
+                            }) { Text("复制 UID") }
                             OutlinedButton(onClick = { showReset = true }, enabled = !running) { Text("重置 UID") }
                             OutlinedButton(onClick = { showPresets = true }, enabled = !running) { Text("游戏预设") }
                             Button(onClick = {
