@@ -1,26 +1,15 @@
-- [![Github](https://img.shields.io/badge/Github-OPL_WpfApp-Green?logo=github)](https://github.com/Guailoudou/OPL-WpfApp)
-- [![Github](https://img.shields.io/badge/Github-openp2p-Green?logo=github)](https://github.com/openp2p-cn/openp2p)
+# OPL Android
 
-# Openp2p Launcher
-Check out this DeepWiki page [https://deepwiki.com/Guailoudou/OPL-WpfApp](https://deepwiki.com/Guailoudou/OPL-WpfApp)
+OPL 的 Android 客户端工程。当前版本提供 UID 隧道配置、游戏预设、本机 UID 管理和前台服务生命周期。
 
-基于openp2p，针对游戏联机简化操作，旨在实现联机更加容易
-## 使用方法
-1. 下载后解压，双击OPL_WpfApp.exe
-2. 被连接的仅需要在无隧道情况下直接启动即可，然后向需要连接你的人提供你的UID和端口号即可
-3. 连接的需要新建隧道，新建隧道时需要输入被连接者的UID和端口号（远程端口）本地端口可根据情况随意（默认相同），协议根据情况选择（MC为TCP），然后点击新建
-4. 根据情况启用隧道，运行过程中会锁定软件，无法操作，连接成功的隧道状态灯会变绿
-5. 预设功能为一些固定端口的程序，如果你还知道其他固定端口的，可以提交给作者添加（该列表为联网更新）
+## 构建
 
-mc使用看[这里](https://blog.gldhn.top/2024/04/22/opl_mc/)，其他的也可以参考
+推送到 `master`、创建 Pull Request 或在 Actions 页面手动运行 **Build Android APK**，GitHub Actions 会生成 `app-debug.apk` 产物。构建不依赖本机 Android SDK 或 Gradle。
 
-**注意，是连接的添加隧道，不是被连接的！！**
+## 本地开发
 
+使用 Android Studio 打开仓库根目录。要求 JDK 17、Android SDK 35 和 Android 8.0（API 26）以上的 ARM64 设备。
 
+## 网络核心
 
-## Star History
-
-[![Page Views Count](https://badges.toozhao.com/badges/01HYF9NYY0SAX27H0SSAB6KT5W/green.svg)](https://badges.toozhao.com/stats/01HYF9NYY0SAX27H0SSAB6KT5W "Get your own page views count badge on badges.toozhao.com")
-
-[![Star History Chart](https://api.star-history.com/svg?repos=Guailoudou/OPL-WpfApp&type=Date)](https://star-history.com/#Guailoudou/OPL-WpfApp&Date)
-
+此提交完成 Android UI、配置持久化和前台服务骨架。实际 OpenP2P 网络核心需要以 JNI 库形式接入，不能将 Windows 的 `openp2p.exe` 直接带入 Android 应用。
