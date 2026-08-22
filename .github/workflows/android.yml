@@ -30,7 +30,6 @@ jobs:
           export PATH="$(go env GOPATH)/bin:$PATH"
           go install golang.org/x/mobile/cmd/gomobile@7c4916698cc93475ebfea76748ee0faba2deb2a5
           go install golang.org/x/mobile/cmd/gobind@7c4916698cc93475ebfea76748ee0faba2deb2a5
-          gomobile init
           cd /tmp/openp2p/core
           gomobile bind -target android -v
           mkdir -p "$GITHUB_WORKSPACE/app/libs"
