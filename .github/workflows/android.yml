@@ -31,7 +31,7 @@ jobs:
           go install golang.org/x/mobile/cmd/gomobile@7c4916698cc93475ebfea76748ee0faba2deb2a5
           go install golang.org/x/mobile/cmd/gobind@7c4916698cc93475ebfea76748ee0faba2deb2a5
           cd /tmp/openp2p/core
-          gomobile bind -target android/26 -v
+          gomobile bind -target android -androidapi 26 -v
           mkdir -p "$GITHUB_WORKSPACE/app/libs"
           cp openp2p.aar "$GITHUB_WORKSPACE/app/libs/"
       - uses: gradle/actions/setup-gradle@v4
