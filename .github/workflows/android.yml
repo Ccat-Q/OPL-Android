@@ -21,6 +21,19 @@ jobs:
           java-version: '17'
           cache: gradle
       - uses: android-actions/setup-android@v3
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.20.x'
+      - name: Build OpenP2P Android core
+        run: |
+          git clone --depth 1 https://github.com/openp2p-cn/openp2p.git /tmp/openp2p
+          export PATH="$(go env GOPATH)/bin:$PATH"
+          go install golang.org/x/mobile/cmd/gomobile@7c4916698cc93475ebfea76748ee0faba2deb2a5
+          gomobile init
+          cd /tmp/openp2p/core
+          gomobile bind -target android -v
+          mkdir -p "$GITHUB_WORKSPACE/app/libs"
+          cp openp2p.aar "$GITHUB_WORKSPACE/app/libs/"
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.10.2'

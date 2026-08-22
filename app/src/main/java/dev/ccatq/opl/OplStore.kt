@@ -3,6 +3,7 @@ package dev.ccatq.opl
 import android.content.Context
 import org.json.JSONArray
 import org.json.JSONObject
+import java.io.File
 import java.util.UUID
 
 data class Tunnel(
@@ -58,6 +59,26 @@ class OplStore(context: Context) {
         val uid = newUid()
         preferences.edit().putString("uid", uid).putString("tunnels", "[]").apply()
         return OplState(uid, emptyList())
+    }
+
+    fun writeOpenP2pConfig(context: Context, state: OplState = load()) {
+        val apps = JSONArray()
+        state.tunnels.filter { it.enabled }.forEach { tunnel ->
+            apps.put(JSONObject().apply {
+                put("AppName", tunnel.name); put("PeerNode", tunnel.peerUid)
+                put("Protocol", tunnel.protocol.lowercase()); put("SrcPort", tunnel.localPort)
+                put("DstPort", tunnel.remotePort); put("DstHost", "localhost")
+                put("Enabled", 1); put("Whitelist", ""); put("PeerUser", ""); put("RelayNode", "")
+            })
+        }
+        val config = JSONObject().apply {
+            put("Network", JSONObject().apply {
+                put("Token", "11602319472897248650"); put("Node", state.uid); put("User", "gldoffice")
+                put("ShareBandwidth", 10); put("ServerHost", "api.openp2p.cn"); put("ServerPort", 27183); put("PublicIPPort", 0)
+            })
+            put("Apps", apps); put("LogLevel", 1)
+        }
+        File(context.getExternalFilesDir(null), "config.json").writeText(config.toString())
     }
 
     private fun newUid(): String = UUID.randomUUID().toString().replace("-", "").take(12)

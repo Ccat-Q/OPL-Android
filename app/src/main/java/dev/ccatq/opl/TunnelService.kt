@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
+import openp2p.Openp2p
 
 class TunnelService : Service() {
     override fun onBind(intent: Intent?): IBinder? = null
@@ -19,17 +20,23 @@ class TunnelService : Service() {
         } else {
             createChannel()
             running = true
+            OplStore(this).writeOpenP2pConfig(this)
             startForeground(NOTIFICATION_ID, NotificationCompat.Builder(this, CHANNEL_ID)
                 .setSmallIcon(android.R.drawable.stat_sys_upload)
                 .setContentTitle("OPL 正在运行")
-                .setContentText("隧道服务已启动，配置将在原生网络核心接入后生效。")
+                .setContentText("正在连接 OpenP2P 网络。")
                 .setOngoing(true)
                 .build())
+            Thread {
+                runCatching {
+                    Openp2p.runAsModule(getExternalFilesDir(null).toString(), null, 0, 1).connect(30_000)
+                }
+            }.start()
         }
         return START_NOT_STICKY
     }
 
-    override fun onDestroy() { running = false; super.onDestroy() }
+    override fun onDestroy() { running = false; runCatching { Openp2p.stop() }; super.onDestroy() }
 
     private fun createChannel() {
         val manager = getSystemService(NotificationManager::class.java)
